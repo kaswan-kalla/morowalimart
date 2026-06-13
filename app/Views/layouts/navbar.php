@@ -5,7 +5,7 @@
             <span class="logo-wrap bg-white rounded-2 p-1 d-inline-flex align-items-center justify-content-center" style="width:38px;height:38px;">
                 <img src="<?= base_url('asset/img/logo.png') ?>" alt="Morowalimart" height="30" class="m-auto">
             </span>
-            <span class="fw-bold fs-5 ms-2">Morowalimart</span>
+            <span class="fw-bold fs-5 ms-2">Morowalimart2</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
