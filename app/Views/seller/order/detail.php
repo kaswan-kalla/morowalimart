@@ -27,7 +27,7 @@
                         <?php foreach ($items as $item): ?>
                             <div class="d-flex align-items-center gap-3 border-bottom pb-2 mb-2">
                                 <img src="<?= base_url('uploads/products/' . ($item['image'] ?? 'default.png')) ?>"
-                                     class="rounded" width="60" height="60" style="object-fit:cover">
+                                    class="rounded" width="60" height="60" style="object-fit:cover">
                                 <div class="flex-grow-1">
                                     <p class="mb-0 fw-semibold"><?= esc($item['product_name']) ?></p>
                                     <small class="text-muted"><?= $item['qty'] ?> x Rp <?= number_format($item['price'], 0, ',', '.') ?></small>
@@ -98,25 +98,66 @@
 
 <?= $this->section('scripts') ?>
 <script>
-function processOrder() {
-    $.post('<?= base_url('seller/orders/process') ?>', { id: <?= $order['id'] ?> }, function(res) {
-        if (res.status) { showToast('Pesanan diproses', 'success'); location.reload(); }
-        else showToast(res.message, 'danger');
-    });
-}
+    function processOrder() {
+        $.post('<?= base_url('seller/orders/process') ?>', {
+            id: <?= $order['id'] ?>
+        }, function(res) {
+            if (res.status) {
+                showToast('Pesanan diproses', 'success');
+                location.reload();
+            } else showToast(res.message, 'danger');
+        });
+    }
 
-function shipOrder() {
-    Swal.fire({
-        title: 'Input No. Resi', input: 'text', inputPlaceholder: 'Masukkan nomor resi',
-        showCancelButton: true, confirmButtonText: 'Kirim', cancelButtonText: 'Batal'
-    }).then(result => {
-        if (result.isConfirmed && result.value) {
-            $.post('<?= base_url('seller/orders/ship') ?>', { id: <?= $order['id'] ?>, tracking_number: result.value }, function(res) {
-                if (res.status) { showToast('Pesanan dikirim', 'success'); location.reload(); }
-                else showToast(res.message, 'danger');
+    function shipOrder() {
+        // Fetch couriers first
+        $.get('<?= base_url('seller/orders/get-courier-option') ?>', function(data) {
+            if (data.Result !== 'OK') {
+                showToast('Gagal memuat data kurir', 'error');
+                return;
+            }
+
+            var courierOptions = '';
+            $.each(data.Options, function(i, opt) {
+                courierOptions += '<option value="' + opt.Value + '">' + opt.DisplayText + '</option>';
             });
-        }
-    });
-}
+
+            Swal.fire({
+                title: 'Kirim Pesanan',
+                html: '<div class="mb-3"><label class="form-label text-start d-block">No. Resi</label>' +
+                    '<input id="tracking_number" class="form-control" placeholder="Masukkan nomor resi"></div>' +
+                    '<div class="mb-3"><label class="form-label text-start d-block">Pilih Kurir</label>' +
+                    '<select id="courier_id" class="form-select">' + courierOptions + '</select></div>',
+                showCancelButton: true,
+                confirmButtonText: 'Kirim',
+                cancelButtonText: 'Batal',
+                preConfirm: function() {
+                    var tracking = $('#tracking_number').val();
+                    var courierId = $('#courier_id').val();
+                    if (!tracking) {
+                        Swal.showValidationMessage('No. resi harus diisi');
+                        return false;
+                    }
+                    return {
+                        tracking_number: tracking,
+                        courier_id: courierId
+                    };
+                }
+            }).then(result => {
+                if (result.isConfirmed && result.value) {
+                    $.post('<?= base_url('seller/orders/ship') ?>', {
+                        id: <?= $order['id'] ?>,
+                        tracking_number: result.value.tracking_number,
+                        courier_id: result.value.courier_id
+                    }, function(res) {
+                        if (res.status) {
+                            showToast('Pesanan dikirim', 'success');
+                            location.reload();
+                        } else showToast(res.message, 'danger');
+                    });
+                }
+            });
+        });
+    }
 </script>
 <?= $this->endSection() ?>

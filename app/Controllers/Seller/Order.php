@@ -6,13 +6,14 @@ use App\Controllers\BaseController;
 use App\Models\StoreModel;
 use App\Models\OrderModel;
 use App\Models\OrderItemModel;
+use App\Models\UserModel;
 
 /**
  * Pesanan Seller - proses & kirim
  */
 class Order extends BaseController
 {
-    protected $store, $orderModel, $orderItemModel;
+    protected $store, $orderModel, $orderItemModel, $userModel;
 
     public function __construct()
     {
@@ -20,6 +21,7 @@ class Order extends BaseController
         $this->store = $storeModel->findByUserId(session()->get('user_id'));
         $this->orderModel     = new OrderModel();
         $this->orderItemModel = new OrderItemModel();
+        $this->userModel      = new UserModel();
     }
 
     public function index()
@@ -86,13 +88,36 @@ class Order extends BaseController
         }
 
         $trackingNumber = $this->request->getPost('tracking_number');
+        $courierId      = (int) $this->request->getPost('courier_id');
 
         $this->orderModel->update($id, [
             'status'          => 'shipped',
             'tracking_number' => $trackingNumber,
+            'courier_id'      => $courierId ?: null,
             'shipped_at'      => date('Y-m-d H:i:s'),
         ]);
 
         return $this->response->setJSON(['status' => true, 'message' => 'Pesanan dikirim']);
+    }
+
+    /**
+     * Daftar kurir untuk dropdown
+     */
+    public function getCourierOption()
+    {
+        $couriers = $this->userModel
+            ->where('role', 'courier')
+            ->where('is_active', 1)
+            ->findAll();
+
+        $options = [['DisplayText' => '-- Pilih Kurir --', 'Value' => 0]];
+        foreach ($couriers as $c) {
+            $options[] = [
+                'DisplayText' => $c['name'] . ' (' . $c['email'] . ')',
+                'Value'       => (int) $c['id'],
+            ];
+        }
+
+        return $this->response->setJSON(['Result' => 'OK', 'Options' => $options]);
     }
 }

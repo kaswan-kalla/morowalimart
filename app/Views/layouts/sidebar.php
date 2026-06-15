@@ -63,6 +63,7 @@
             <a class="nav-link <?= $isActive('admin/survey') ?>" href="<?= base_url('admin/survey') ?>">
                 <i class="bi bi-bar-chart me-2"></i>Data Survey
             </a>
+            <a class="nav-link " href="<?= base_url('admin/users') ?>?"><i class="bi bi-person-badge me-2"></i>Kelola Kurir</a>
         </nav>
     <?php endif; ?>
 

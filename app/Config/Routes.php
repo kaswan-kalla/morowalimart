@@ -141,6 +141,7 @@ $routes->group('seller', ['filter' => 'seller'], function ($routes) {
     $routes->post('pesanan/process/(:num)', 'Seller\Order::process/$1');
     $routes->post('orders/ship', 'Seller\Order::ship');
     $routes->post('pesanan/ship/(:num)', 'Seller\Order::ship/$1');
+    $routes->get('orders/get-courier-option', 'Seller\Order::getCourierOption');
 
     // Toko
     $routes->get('store', 'Seller\Store::index');
@@ -211,6 +212,13 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     // Survey
     $routes->get('survey', 'Admin\Survey::index');
     $routes->get('survey/data', 'Admin\Survey::data');
+});
+
+// === COURIER DASHBOARD ===
+$routes->group('courier', ['filter' => 'courier'], function ($routes) {
+    $routes->get('/', 'Courier::index');
+    $routes->get('(:num)', 'Courier::detail/$1');
+    $routes->post('complete', 'Courier::complete');
 });
 
 /*
