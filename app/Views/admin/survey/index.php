@@ -31,8 +31,8 @@
             <div class="col-6 col-md-3">
                 <div class="card shadow-sm border-0 bg-warning text-white">
                     <div class="card-body">
-                        <small>Rata-rata Pengeluaran</small>
-                        <h3 class="fw-bold mb-0" id="avgPengeluaran">Rp 0</h3>
+                        <small>Kategori Pengeluaran</small>
+                        <h3 class="fw-bold mb-0" id="totalPengeluaran">0</h3>
                     </div>
                 </div>
             </div>
@@ -62,11 +62,11 @@
             <div class="col-md-6">
                 <div class="card shadow-sm h-100">
                     <div class="card-body d-flex flex-column">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-heart me-2"></i>Status Menikah</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-wallet2 me-2"></i>Pengeluaran Rutin</h6>
                         <div style="max-height:260px;position:relative;">
-                            <canvas id="pieStatus"></canvas>
+                            <canvas id="piePengeluaran"></canvas>
                         </div>
-                        <div class="mt-3" id="statusLegend"></div>
+                        <div class="mt-3" id="pengeluaranLegend"></div>
                     </div>
                 </div>
             </div>
@@ -103,12 +103,13 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     let chartDesa = null;
-    let chartStatus = null;
+    let chartPengeluaran = null;
 
     const COLORS = [
         '#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6f42c1',
         '#fd7e14', '#20c997', '#e83e8c', '#6610f2'
     ];
+    const PENGELUARAN_COLORS = ['#28a745', '#17a2b8', '#ffc107', '#dc3545'];
 
     function refreshData() {
         $.get('<?= base_url('admin/survey/data') ?>', function(res) {
@@ -118,7 +119,7 @@
             // Stat cards
             $('#totalResponden').text(res.total);
             $('#totalDesa').text(res.per_desa.length);
-            $('#avgPengeluaran').text('Rp ' + new Intl.NumberFormat('id-ID').format(res.avg_pengeluaran));
+            $('#totalPengeluaran').text(res.per_pengeluaran.length + ' kategori');
             $('#totalStatus').text(res.per_status.length + ' kategori');
 
             // Pie Desa
@@ -126,10 +127,10 @@
             let desaData = res.per_desa.map(d => d.jumlah);
             renderPieDesa(desaLabels, desaData, res.total);
 
-            // Pie Status
-            let statusLabels = res.per_status.map(s => s.status_menikah);
-            let statusData = res.per_status.map(s => s.jumlah);
-            renderPieStatus(statusLabels, statusData, res.total);
+            // Pie Pengeluaran
+            let pengeluaranLabels = res.per_pengeluaran.map(p => p.pengeluaran_perbulan);
+            let pengeluaranData = res.per_pengeluaran.map(p => p.jumlah);
+            renderPiePengeluaran(pengeluaranLabels, pengeluaranData, res.total);
 
             // Table
             let html = '';
@@ -139,7 +140,7 @@
                 <td>${escapeHtml(r.nama)}</td>
                 <td>${escapeHtml(r.no_wa)}</td>
                 <td>${escapeHtml(r.alamat)}</td>
-                <td>Rp ${new Intl.NumberFormat('id-ID').format(r.pengeluaran_perbulan)}</td>
+                <td>${escapeHtml(r.pengeluaran_perbulan)}</td>
                 <td><span class="badge bg-${r.status_menikah === 'Menikah' ? 'primary' : 'secondary'}">${escapeHtml(r.status_menikah)}</span></td>
                 <td>${new Date(r.created_at).toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</td>
             </tr>`;
@@ -194,16 +195,16 @@
         $('#desaLegend').html(html);
     }
 
-    function renderPieStatus(labels, data, total) {
-        let ctx = document.getElementById('pieStatus').getContext('2d');
-        if (chartStatus) chartStatus.destroy();
-        chartStatus = new Chart(ctx, {
+    function renderPiePengeluaran(labels, data, total) {
+        let ctx = document.getElementById('piePengeluaran').getContext('2d');
+        if (chartPengeluaran) chartPengeluaran.destroy();
+        chartPengeluaran = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: labels,
                 datasets: [{
                     data: data,
-                    backgroundColor: ['#0d6efd', '#6c757d'],
+                    backgroundColor: PENGELUARAN_COLORS.slice(0, labels.length),
                 }]
             },
             options: {
@@ -229,11 +230,11 @@
         let html = '<div class="row g-1">';
         labels.forEach(function(lbl, i) {
             let pct = ((data[i] / total) * 100).toFixed(1);
-            let bg = i === 0 ? '#0d6efd' : '#6c757d';
+            let bg = PENGELUARAN_COLORS[i] || COLORS[i];
             html += `<div class="col-6"><span class="d-inline-block rounded-circle me-1" style="width:10px;height:10px;background:${bg}"></span> ${lbl}: <strong>${data[i]}</strong> (${pct}%)</div>`;
         });
         html += '</div>';
-        $('#statusLegend').html(html);
+        $('#pengeluaranLegend').html(html);
     }
 
     function escapeHtml(str) {

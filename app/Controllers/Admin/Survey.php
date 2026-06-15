@@ -31,20 +31,20 @@ class Survey extends BaseController
         $query = $db->query("SELECT status_menikah, COUNT(*) as jumlah FROM surveys GROUP BY status_menikah");
         $perStatus = $query->getResultArray();
 
+        // Rentang pengeluaran
+        $query = $db->query("SELECT pengeluaran_perbulan, COUNT(*) as jumlah FROM surveys GROUP BY pengeluaran_perbulan ORDER BY FIELD(pengeluaran_perbulan, 'Dibawah 1jt','1jt - 2jt','2jt - 3jt','Diatas 3jt')");
+        $perPengeluaran = $query->getResultArray();
+
         // Data terbaru
         $latest = $model->orderBy('created_at', 'DESC')->findAll(50);
-
-        // Rata-rata pengeluaran
-        $query = $db->query("SELECT AVG(pengeluaran_perbulan) as rata FROM surveys");
-        $avgPengeluaran = $query->getRow()->rata ?? 0;
 
         return $this->response->setJSON([
             'status' => true,
             'total' => (int)$total,
             'per_desa' => $perDesa,
             'per_status' => $perStatus,
+            'per_pengeluaran' => $perPengeluaran,
             'latest' => $latest,
-            'avg_pengeluaran' => round($avgPengeluaran),
         ]);
     }
 }

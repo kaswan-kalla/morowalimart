@@ -28,8 +28,8 @@ class SurveyModel extends Model
     protected $validationRules  = [
         'nama'                => 'required|min_length[3]|max_length[100]',
         'alamat'              => 'required|in_list[Desa Labota,Desa Keurea,Desa Makarti,Desa Baho Makmur,Desa Bahodopi,Desa Fatufia]',
-        'pengeluaran_perbulan' => 'required|numeric|greater_than[0]',
+        'pengeluaran_perbulan' => 'required|in_list[Dibawah 1jt,1jt - 2jt,2jt - 3jt,Diatas 3jt]',
         'status_menikah'       => 'required|in_list[Menikah,Belum Menikah]',
-        'no_wa'               => 'required|numeric|min_length[10]|max_length[15]',
+        'no_wa'               => 'required|min_length[11]|max_length[15]',
     ];
 }

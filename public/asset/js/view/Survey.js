@@ -1,7 +1,6 @@
 function toggleBtnMulai() {
   $('#btnMulai').prop('disabled', !$('#siap_member').is(':checked'));
 }
-
 $(document).ready(function () {
   toggleBtnMulai();
   $(document).on('change click', '#siap_member', toggleBtnMulai);

@@ -1,10 +1,17 @@
+<?php
+
+/** @var array $categories */
+/** @var array $latest_products */
+/** @var array $popular_products */
+?>
+
 <!-- Hero Section -->
 <div class="bg-primary text-white py-5 mb-4">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6">
                 <h1 class="fw-bold">Belanja Online Terpercaya</h1>
-                <p class="lead">Temukan produk terbaik dari berbagai penjual. Harga bersaing, kualitas terjamin.</p>
+                <p class="lead">Temukan produk terbaik dari kami. Harga bersaing, kualitas terjamin.</p>
                 <a href="<?= base_url('produk') ?>" class="btn btn-light btn-lg">
                     <i class="bi bi-grid me-1"></i> Jelajahi Produk
                 </a>

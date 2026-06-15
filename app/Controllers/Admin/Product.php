@@ -80,8 +80,8 @@ class Product extends BaseController
         $sku   = $this->request->getPost('sku');
         $slug  = generate_slug($name);
 
-        // Validasi slug ganda
-        $existing = $this->productModel->where('slug', $slug)->first();
+        // Validasi slug ganda (termasuk yg soft-delete)
+        $existing = $this->productModel->withDeleted()->where('slug', $slug)->first();
         if ($existing) {
             $slug = $slug . '-' . time();
         }
@@ -191,11 +191,12 @@ class Product extends BaseController
         return $this->response->setJSON(['status' => true, 'message' => 'Produk berhasil diperbarui']);
     }
 
-    public function toggle($id)
+    public function toggle()
     {
         if (!$this->request->isAJAX()) {
             return $this->response->setJSON(['status' => false]);
         }
+        $id = (int) $this->request->getPost('id');
         $product = $this->productModel->find($id);
         if (!$product) {
             return $this->response->setJSON(['status' => false, 'message' => 'Produk tidak ditemukan']);

@@ -5,6 +5,23 @@
  * Fungsi-fungsi umum yang digunakan di seluruh aplikasi
  */
 
+if (!function_exists('asset_url')) {
+    /**
+     * Generate URL untuk asset (CSS/JS) dengan cache-buster otomatis
+     * berdasarkan file modification time, sehingga browser auto reload
+     * saat file diubah tanpa perlu hard refresh.
+     *
+     * @param string $path Path relatif dari folder public/, e.g. "asset/css/style.css"
+     * @return string Full URL dengan ?v=timestamp
+     */
+    function asset_url($path)
+    {
+        $fullPath = FCPATH . $path;
+        $version = file_exists($fullPath) ? filemtime($fullPath) : time();
+        return base_url($path) . '?v=' . $version;
+    }
+}
+
 if (!function_exists('format_rupiah')) {
     /**
      * Format angka ke format Rupiah

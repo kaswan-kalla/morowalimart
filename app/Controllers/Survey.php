@@ -31,9 +31,9 @@ class Survey extends BaseController
         $data = [
             'nama'                => $this->request->getPost('nama'),
             'alamat'              => $this->request->getPost('alamat'),
-            'pengeluaran_perbulan' => str_replace('.', '', $this->request->getPost('pengeluaran_perbulan')),
+            'pengeluaran_perbulan' => $this->request->getPost('pengeluaran_perbulan'),
             'status_menikah'       => $this->request->getPost('status_menikah'),
-            'no_wa'               => $this->request->getPost('no_wa'),
+            'no_wa'               => '62' . ltrim($this->request->getPost('no_wa'), '0'),
         ];
 
         if (!$this->surveyModel->insert($data)) {

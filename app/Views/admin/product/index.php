@@ -167,12 +167,12 @@
             res.data.forEach(function(p) {
                 let imgSrc = p.main_image ?
                     base_url + p.main_image :
-                    base_url + 'uploads/products/default.png';
+                    base_url + 'uploads/products/default.jpg';
                 let price = p.discount_price > 0 ? p.discount_price : p.price;
                 let badge = p.stock <= 5 ? 'bg-danger' : (p.stock <= 10 ? 'bg-warning text-dark' : 'bg-success');
 
                 html += `<tr>
-                <td><img src="${imgSrc}" class="rounded" width="50" height="50" style="object-fit:cover" onerror="this.src='${base_url}uploads/products/default.png'"></td>
+                <td><img src="${imgSrc}" class="rounded" width="50" height="50" style="object-fit:cover" onerror="this.src='${base_url}uploads/products/default.jpg'"></td>
                 <td><strong>${escHtml(p.name)}</strong><br><small class="text-muted">${escHtml(p.category_name || '-')}</small></td>
                 <td><span class="text-muted">${p.sku || '-'}</span></td>
                 <td>${escHtml(p.store_name || '-')}</td>
