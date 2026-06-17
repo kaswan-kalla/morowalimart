@@ -317,9 +317,11 @@
         function addToCart(productId, qty) {
             qty = qty || 1;
             $.post(
-                base_url + 'cart/add',
-                { product_id: productId, quantity: qty },
-                function (res) {
+                base_url + 'cart/add', {
+                    product_id: productId,
+                    quantity: qty
+                },
+                function(res) {
                     if (!res.status && typeof showToast === 'function') {
                         showToast(res.message, 'error');
                     }

@@ -5,10 +5,15 @@ $(document).ready(function () {
     if (typeof snap !== 'undefined' && snapToken) {
       snap.pay(snapToken, {
         onSuccess: function (result) {
-          showToast('Pembayaran berhasil! Pesanan sedang diproses.', 'success');
-          setTimeout(function () {
-            window.location.href = base_url + 'order/' + orderId;
-          }, 1500);
+          // Ubah tombol bayar jadi "Lihat Pesanan"
+          $('#btnSnapPay')
+            .removeClass('btn-primary')
+            .addClass('btn-success')
+            .html('<i class="bi bi-receipt"></i> Lihat Pesanan')
+            .off('click')
+            .on('click', function () {
+              window.location.href = base_url + 'order/' + orderId;
+            });
         },
         onPending: function (result) {
           showToast(
