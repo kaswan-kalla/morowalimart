@@ -12,14 +12,14 @@ use App\Models\PaymentLogModel;
  */
 class PaymentService
 {
-    protected OrderModel          $orderModel;
-    protected PaymentModel        $paymentModel;
-    protected PaymentLogModel     $paymentLogModel;
-    protected MidtransService     $midtransService;
-    protected InventoryService    $inventoryService;
-    protected OrderService        $orderService;
-    protected InvoiceService      $invoiceService;
-    protected NotificationService $notificationService;
+    protected $orderModel;
+    protected $paymentModel;
+    protected $paymentLogModel;
+    protected $midtransService;
+    protected $inventoryService;
+    protected $orderService;
+    protected $invoiceService;
+    protected $notificationService;
 
     public function __construct()
     {

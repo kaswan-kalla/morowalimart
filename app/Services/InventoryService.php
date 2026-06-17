@@ -10,8 +10,8 @@ use App\Models\StockMovementModel;
  */
 class InventoryService
 {
-    protected ProductModel $productModel;
-    protected StockMovementModel $stockMovementModel;
+    protected $productModel;
+    protected $stockMovementModel;
 
     public function __construct()
     {

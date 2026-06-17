@@ -10,8 +10,8 @@ use App\Models\UserModel;
  */
 class NotificationService
 {
-    protected NotificationModel $notificationModel;
-    protected UserModel $userModel;
+    protected $notificationModel;
+    protected $userModel;
 
     public function __construct()
     {

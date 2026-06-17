@@ -11,9 +11,9 @@ use App\Models\AddressModel;
  */
 class InvoiceService
 {
-    protected OrderModel     $orderModel;
-    protected OrderItemModel $orderItemModel;
-    protected AddressModel   $addressModel;
+    protected $orderModel;
+    protected $orderItemModel;
+    protected $addressModel;
 
     public function __construct()
     {

@@ -8,10 +8,10 @@ namespace App\Services;
  */
 class MidtransService
 {
-    protected string $serverKey;
-    protected string $clientKey;
-    protected bool $isProduction;
-    protected string $snapBaseUrl;
+    protected $serverKey;
+    protected $clientKey;
+    protected $isProduction;
+    protected $snapBaseUrl;
 
     public function __construct()
     {

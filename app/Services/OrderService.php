@@ -13,11 +13,11 @@ use App\Models\AuditLogModel;
  */
 class OrderService
 {
-    protected OrderModel          $orderModel;
-    protected OrderItemModel      $orderItemModel;
-    protected OrderHistoryModel   $orderHistoryModel;
-    protected OrderFulfillmentModel $fulfillmentModel;
-    protected AuditLogModel       $auditLogModel;
+    protected $orderModel;
+    protected $orderItemModel;
+    protected $orderHistoryModel;
+    protected $fulfillmentModel;
+    protected $auditLogModel;
 
     public function __construct()
     {
