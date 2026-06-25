@@ -7,7 +7,7 @@
             </span>
             <div class="ms-2">
                 <div class="fw-bold fs-5" style="margin-bottom:0px;">Morowali<span style="color: #fdc306ff;">mart</span></div>
-                <small class="d-block" style="font-size:0.6rem;line-height:1.2;color: mistyrose;">Membangun ekonomi ummat </br> <span style="color: #fdc306ff;">Dari ummat untuk ummat</span></small>
+                <small class="d-block" style="font-size:0.6rem;line-height:1.2;color: mistyrose;">Sinergi Dakwah </br> <span style="color: #fdc306ff;">Membangun Ekonomi Umat</span></small>
             </div>
         </a>
         <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav">

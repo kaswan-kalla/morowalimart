@@ -84,13 +84,41 @@
                             </div>
                         </div>
 
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Anda lebih suka belanja yang mana <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="preferensi_belanja" value="Offline" id="belanja_offline" required>
+                                    <label class="form-check-label" for="belanja_offline">Offline (langsung ke toko)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="preferensi_belanja" value="Online" id="belanja_online">
+                                    <label class="form-check-label" for="belanja_online">Online (diantarkan)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Jika diminta, apakah anda siap investasi dalam usaha ini <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="siap_investasi" value="Siap Investasi" id="investasi_siap" required>
+                                    <label class="form-check-label" for="investasi_siap">Siap Investasi</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="siap_investasi" value="Belum Siap" id="investasi_belum">
+                                    <label class="form-check-label" for="investasi_belum">Belum Siap</label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mb-3 form-check">
                             <input class="form-check-input" type="checkbox" id="siap_member" name="siap_member" value="1">
                             <label class="form-check-label" for="siap_member">
                                 <strong>Insya Allah</strong> siap berbelanja untuk dukung dakwah.
                             </label>
                         </div>
-
                         <button type="submit" class="btn btn-primary w-100 btn-lg" id="btnMulai" disabled>
                             <i class="bi bi-send me-2"></i>Mulai
                         </button>

@@ -29,11 +29,14 @@ class Survey extends BaseController
         }
 
         $data = [
-            'nama'                => $this->request->getPost('nama'),
-            'alamat'              => $this->request->getPost('alamat'),
-            'pengeluaran_perbulan' => $this->request->getPost('pengeluaran_perbulan'),
-            'status_menikah'       => $this->request->getPost('status_menikah'),
-            'no_wa'               => '62' . ltrim($this->request->getPost('no_wa'), '0'),
+            'nama'                 => $this->request->getPost('nama'),
+            'alamat'               => $this->request->getPost('alamat'),
+            'pengeluaran_perbulan'  => $this->request->getPost('pengeluaran_perbulan'),
+            'status_menikah'        => $this->request->getPost('status_menikah'),
+            'no_wa'                => '62' . ltrim($this->request->getPost('no_wa'), '0'),
+            'siap_member'          => $this->request->getPost('siap_member') ? 1 : 0,
+            'preferensi_belanja'   => $this->request->getPost('preferensi_belanja'),
+            'siap_investasi'       => $this->request->getPost('siap_investasi'),
         ];
 
         if (!$this->surveyModel->insert($data)) {

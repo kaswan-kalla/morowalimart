@@ -18,6 +18,9 @@ class SurveyModel extends Model
         'pengeluaran_perbulan',
         'status_menikah',
         'no_wa',
+        'siap_member',
+        'preferensi_belanja',
+        'siap_investasi',
     ];
 
     protected $useTimestamps    = true;
@@ -26,10 +29,12 @@ class SurveyModel extends Model
     protected $updatedField     = 'updated_at';
 
     protected $validationRules  = [
-        'nama'                => 'required|min_length[3]|max_length[100]',
-        'alamat'              => 'required|in_list[Desa Labota,Desa Keurea,Desa Makarti,Desa Baho Makmur,Desa Bahodopi,Desa Fatufia]',
-        'pengeluaran_perbulan' => 'required|in_list[Dibawah 1jt,1jt - 2jt,2jt - 3jt,Diatas 3jt]',
-        'status_menikah'       => 'required|in_list[Menikah,Belum Menikah]',
-        'no_wa'               => 'required|min_length[11]|max_length[15]',
+        'nama'                 => 'required|min_length[3]|max_length[100]',
+        'alamat'               => 'required|in_list[Desa Labota,Desa Keurea,Desa Makarti,Desa Baho Makmur,Desa Bahodopi,Desa Fatufia]',
+        'pengeluaran_perbulan'  => 'required|in_list[Dibawah 1jt,1jt - 2jt,2jt - 3jt,Diatas 3jt]',
+        'status_menikah'        => 'required|in_list[Menikah,Belum Menikah]',
+        'no_wa'                => 'required|min_length[11]|max_length[15]',
+        'preferensi_belanja'   => 'required|in_list[Offline,Online]',
+        'siap_investasi'       => 'required|in_list[Siap Investasi,Belum Siap]',
     ];
 }
