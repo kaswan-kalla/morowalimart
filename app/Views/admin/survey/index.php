@@ -44,6 +44,14 @@
                     </div>
                 </div>
             </div>
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm border-0 bg-dark text-white">
+                    <div class="card-body">
+                        <small>Siap Member</small>
+                        <h3 class="fw-bold mb-0" id="totalSiapMember">0</h3>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Charts Row -->
@@ -72,6 +80,32 @@
             </div>
         </div>
 
+        <!-- Charts Row 2 -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-bag me-2"></i>Preferensi Belanja</h6>
+                        <div style="max-height:260px;position:relative;">
+                            <canvas id="piePreferensi"></canvas>
+                        </div>
+                        <div class="mt-3" id="preferensiLegend"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-piggy-bank me-2"></i>Kesiapan Investasi</h6>
+                        <div style="max-height:260px;position:relative;">
+                            <canvas id="pieInvestasi"></canvas>
+                        </div>
+                        <div class="mt-3" id="investasiLegend"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Table -->
         <div class="card shadow-sm">
             <div class="card-header bg-white">
@@ -88,6 +122,9 @@
                                 <th>Desa</th>
                                 <th>Pengeluaran</th>
                                 <th>Status</th>
+                                <th>Belanja</th>
+                                <th>Investasi</th>
+                                <th>Siap Member</th>
                                 <th>Tanggal</th>
                             </tr>
                         </thead>
@@ -110,6 +147,8 @@
         '#fd7e14', '#20c997', '#e83e8c', '#6610f2'
     ];
     const PENGELUARAN_COLORS = ['#28a745', '#17a2b8', '#ffc107', '#dc3545'];
+    let chartPreferensi = null;
+    let chartInvestasi = null;
 
     function refreshData() {
         $.get('<?= base_url('admin/survey/data') ?>', function(res) {
@@ -121,6 +160,7 @@
             $('#totalDesa').text(res.per_desa.length);
             $('#totalPengeluaran').text(res.per_pengeluaran.length + ' kategori');
             $('#totalStatus').text(res.per_status.length + ' kategori');
+            $('#totalSiapMember').text(res.siap_member + ' orang');
 
             // Pie Desa
             let desaLabels = res.per_desa.map(d => d.alamat);
@@ -132,6 +172,16 @@
             let pengeluaranData = res.per_pengeluaran.map(p => p.jumlah);
             renderPiePengeluaran(pengeluaranLabels, pengeluaranData, res.total);
 
+            // Pie Preferensi Belanja
+            let preferensiLabels = res.per_preferensi.map(p => p.preferensi_belanja || 'Tidak menjawab');
+            let preferensiData = res.per_preferensi.map(p => p.jumlah);
+            renderPiePreferensi(preferensiLabels, preferensiData, res.total);
+
+            // Pie Investasi
+            let investasiLabels = res.per_investasi.map(p => p.siap_investasi || 'Tidak menjawab');
+            let investasiData = res.per_investasi.map(p => p.jumlah);
+            renderPieInvestasi(investasiLabels, investasiData, res.total);
+
             // Table
             let html = '';
             res.latest.forEach(function(r, i) {
@@ -142,14 +192,17 @@
                 <td>${escapeHtml(r.alamat)}</td>
                 <td>${escapeHtml(r.pengeluaran_perbulan)}</td>
                 <td><span class="badge bg-${r.status_menikah === 'Menikah' ? 'primary' : 'secondary'}">${escapeHtml(r.status_menikah)}</span></td>
+                <td><span class="badge bg-info text-white">${escapeHtml(r.preferensi_belanja || '-')}</span></td>
+                <td><span class="badge bg-${r.siap_investasi === 'Siap Investasi' ? 'success' : 'warning'} text-white">${escapeHtml(r.siap_investasi || '-')}</span></td>
+                <td>${r.siap_member == 1 ? '<span class="badge bg-success">Ya</span>' : '<span class="badge bg-secondary">Tidak</span>'}</td>
                 <td>${new Date(r.created_at).toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</td>
             </tr>`;
             });
-            $('#surveyBody').html(html || '<tr><td colspan="7" class="text-center">Belum ada data survey</td></tr>');
+            $('#surveyBody').html(html || '<tr><td colspan="10" class="text-center">Belum ada data survey</td></tr>');
         }).fail(function(xhr) {
             console.error('Survey API error:', xhr.status, xhr.responseText.substring(0, 500));
             $('#totalResponden').text('ERR');
-            $('#surveyBody').html('<tr><td colspan="7" class="text-center text-danger">Gagal load data: HTTP ' + xhr.status + '</td></tr>');
+            $('#surveyBody').html('<tr><td colspan="10" class="text-center text-danger">Gagal load data: HTTP ' + xhr.status + '</td></tr>');
         });
     }
 
@@ -240,6 +293,76 @@
     function escapeHtml(str) {
         if (!str) return '';
         return $('<span>').text(str).html();
+    }
+
+    function renderPiePreferensi(labels, data, total) {
+        let ctx = document.getElementById('piePreferensi').getContext('2d');
+        if (chartPreferensi) chartPreferensi.destroy();
+        chartPreferensi = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{ data: data, backgroundColor: ['#0d6efd','#dc3545','#6c757d'].slice(0, labels.length) }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                let val = ctx.parsed;
+                                let pct = ((val / total) * 100).toFixed(1);
+                                return ctx.label + ': ' + val + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        let html = '<div class="row g-1">';
+        labels.forEach(function(lbl, i) {
+            let pct = ((data[i] / total) * 100).toFixed(1);
+            let bg = ['#0d6efd','#dc3545','#6c757d'][i];
+            html += '<div class="col-6"><span class="d-inline-block rounded-circle me-1" style="width:10px;height:10px;background:' + bg + '"></span> ' + lbl + ': <strong>' + data[i] + '</strong> (' + pct + '%)</div>';
+        });
+        html += '</div>';
+        $('#preferensiLegend').html(html);
+    }
+
+    function renderPieInvestasi(labels, data, total) {
+        let ctx = document.getElementById('pieInvestasi').getContext('2d');
+        if (chartInvestasi) chartInvestasi.destroy();
+        chartInvestasi = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{ data: data, backgroundColor: ['#198754','#ffc107','#6c757d'].slice(0, labels.length) }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                let val = ctx.parsed;
+                                let pct = ((val / total) * 100).toFixed(1);
+                                return ctx.label + ': ' + val + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        let html = '<div class="row g-1">';
+        labels.forEach(function(lbl, i) {
+            let pct = ((data[i] / total) * 100).toFixed(1);
+            let bg = ['#198754','#ffc107','#6c757d'][i];
+            html += '<div class="col-6"><span class="d-inline-block rounded-circle me-1" style="width:10px;height:10px;background:' + bg + '"></span> ' + lbl + ': <strong>' + data[i] + '</strong> (' + pct + '%)</div>';
+        });
+        html += '</div>';
+        $('#investasiLegend').html(html);
     }
 
     $(document).ready(refreshData);

@@ -35,6 +35,17 @@ class Survey extends BaseController
         $query = $db->query("SELECT pengeluaran_perbulan, COUNT(*) as jumlah FROM surveys GROUP BY pengeluaran_perbulan ORDER BY FIELD(pengeluaran_perbulan, 'Dibawah 1jt','1jt - 2jt','2jt - 3jt','Diatas 3jt')");
         $perPengeluaran = $query->getResultArray();
 
+        // Preferensi belanja
+        $query = $db->query("SELECT preferensi_belanja, COUNT(*) as jumlah FROM surveys GROUP BY preferensi_belanja");
+        $perPreferensi = $query->getResultArray();
+
+        // Siap investasi
+        $query = $db->query("SELECT siap_investasi, COUNT(*) as jumlah FROM surveys GROUP BY siap_investasi");
+        $perInvestasi = $query->getResultArray();
+
+        // Siap member
+        $siapMember = $model->where('siap_member', 1)->countAllResults();
+
         // Data terbaru
         $latest = $model->orderBy('created_at', 'DESC')->findAll(50);
 
@@ -44,6 +55,9 @@ class Survey extends BaseController
             'per_desa' => $perDesa,
             'per_status' => $perStatus,
             'per_pengeluaran' => $perPengeluaran,
+            'per_preferensi'   => $perPreferensi,
+            'per_investasi'    => $perInvestasi,
+            'siap_member'      => (int)$siapMember,
             'latest' => $latest,
         ]);
     }
