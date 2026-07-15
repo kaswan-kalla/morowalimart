@@ -21,7 +21,7 @@ class Auth extends BaseController
      */
     public function login()
     {
-        if (is_logged_in()) return redirect()->to('/');
+        if (is_logged_in()) return redirect()->to('home');
         return view('layout/marketplace_content', ['content' => 'auth', 'subview' => 'login', 'meta_title' => 'Login']);
     }
 
@@ -93,7 +93,7 @@ class Auth extends BaseController
      */
     public function register()
     {
-        if (is_logged_in()) return redirect()->to('/');
+        if (is_logged_in()) return redirect()->to('home');
         return view('layout/marketplace_content', ['content' => 'auth', 'subview' => 'register', 'meta_title' => 'Daftar Akun']);
     }
 

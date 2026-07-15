@@ -23,13 +23,13 @@ $routes->setAutoRoute(true);
  * ============================================================
  */
 
-// === SURVEY ===
-$routes->get('survey', 'Survey::index');
-$routes->post('survey/submit', 'Survey::submit');
+// === SURVEY (dinonaktifkan karena sudah selesai) ===
+// $routes->get('survey', 'Survey::index');
+// $routes->post('survey/submit', 'Survey::submit');
 $routes->get('home', 'Home::index');
 
 // === PUBLIC ROUTES ===
-$routes->get('/', 'Survey::index');
+$routes->get('/', 'Auth::login');
 $routes->get('login', 'Auth::login');
 $routes->post('login', 'Auth::loginProcess');
 $routes->get('register', 'Auth::register');
