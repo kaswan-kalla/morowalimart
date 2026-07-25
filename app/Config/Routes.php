@@ -213,9 +213,65 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('vouchers/update/(:num)', 'Admin\Voucher::update/$1');
     $routes->post('vouchers/delete/(:num)', 'Admin\Voucher::delete/$1');
 
+    // Investors
+    $routes->get('investors', 'Admin\Investor::index');
+    $routes->get('investors/data', 'Admin\Investor::data');
+    $routes->get('investors/chart', 'Admin\Investor::chart');
+    $routes->get('investors/get/(:num)', 'Admin\Investor::get/$1');
+    $routes->post('investors/store', 'Admin\Investor::save');
+    $routes->post('investors/update/(:num)', 'Admin\Investor::update/$1');
+    $routes->post('investors/delete/(:num)', 'Admin\Investor::delete/$1');
+
+    // Investment Details
+    $routes->get('investments', 'Admin\InvestmentDetail::index');
+    $routes->get('investments/data', 'Admin\InvestmentDetail::data');
+    $routes->get('investments/chart', 'Admin\InvestmentDetail::chart');
+    $routes->get('investments/get/(:num)', 'Admin\InvestmentDetail::get/$1');
+    $routes->post('investments/store', 'Admin\InvestmentDetail::save');
+    $routes->post('investments/update/(:num)', 'Admin\InvestmentDetail::update/$1');
+    $routes->post('investments/delete/(:num)', 'Admin\InvestmentDetail::delete/$1');
+
     // Survey
     $routes->get('survey', 'Admin\Survey::index');
     $routes->get('survey/data', 'Admin\Survey::data');
+
+    // Inventory - Barang
+    $routes->get('barang', 'Admin\Barang::index');
+    $routes->get('barang/data', 'Admin\Barang::data');
+    $routes->get('barang/get/(:num)', 'Admin\Barang::get/$1');
+    $routes->post('barang/store', 'Admin\Barang::store');
+    $routes->post('barang/update/(:num)', 'Admin\Barang::update/$1');
+    $routes->post('barang/delete/(:num)', 'Admin\Barang::delete/$1');
+
+    // Inventory - Lokasi
+    $routes->get('lokasi', 'Admin\Lokasi::index');
+    $routes->get('lokasi/data', 'Admin\Lokasi::data');
+    $routes->get('lokasi/get/(:num)', 'Admin\Lokasi::get/$1');
+    $routes->post('lokasi/store', 'Admin\Lokasi::store');
+    $routes->post('lokasi/update/(:num)', 'Admin\Lokasi::update/$1');
+    $routes->post('lokasi/delete/(:num)', 'Admin\Lokasi::delete/$1');
+
+    // Inventory - Penerimaan
+    $routes->get('penerimaan', 'Admin\Penerimaan::index');
+    $routes->get('penerimaan/data', 'Admin\Penerimaan::data');
+    $routes->get('penerimaan/get/(:num)', 'Admin\Penerimaan::get/$1');
+    $routes->post('penerimaan/store', 'Admin\Penerimaan::store');
+    $routes->post('penerimaan/update/(:num)', 'Admin\Penerimaan::update/$1');
+    $routes->post('penerimaan/delete/(:num)', 'Admin\Penerimaan::delete/$1');
+
+    // Inventory - Pengeluaran
+    $routes->get('pengeluaran', 'Admin\Pengeluaran::index');
+    $routes->get('pengeluaran/data', 'Admin\Pengeluaran::data');
+    $routes->get('pengeluaran/get/(:num)', 'Admin\Pengeluaran::get/$1');
+    $routes->post('pengeluaran/store', 'Admin\Pengeluaran::store');
+    $routes->post('pengeluaran/update/(:num)', 'Admin\Pengeluaran::update/$1');
+    $routes->post('pengeluaran/delete/(:num)', 'Admin\Pengeluaran::delete/$1');
+
+    // Inventory - Laporan Stok
+    $routes->get('laporan-stok', 'Admin\LaporanStok::index');
+
+    // Inventory - Laba Rugi
+    $routes->get('laba-rugi', 'Admin\LabaRugi::index');
 });
 
 // === COURIER DASHBOARD ===

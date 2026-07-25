@@ -63,6 +63,33 @@
             <a class="nav-link <?= $isActive('admin/survey') ?>" href="<?= base_url('admin/survey') ?>">
                 <i class="bi bi-bar-chart me-2"></i>Data Survey
             </a>
+            <a class="nav-link" href="<?= base_url('admin/investors') ?>">
+                <i class="bi bi-coin me-2"></i>Investor Modal
+            </a>
+            <a class="nav-link" href="<?= base_url('admin/investments') ?>">
+                <i class="bi bi-cash-stack me-2"></i>Penambahan Modal
+            </a>
+            <li class="nav-item">
+                <h6 class="px-3 text-muted text-uppercase small mt-3 mb-2">Inventori</h6>
+            </li>
+            <a class="nav-link <?= $isActive('admin/barang') ?>" href="<?= base_url('admin/barang') ?>">
+                <i class="bi bi-box-seam me-2"></i>Data Barang
+            </a>
+            <a class="nav-link <?= $isActive('admin/lokasi') ?>" href="<?= base_url('admin/lokasi') ?>">
+                <i class="bi bi-geo-alt me-2"></i>Lokasi
+            </a>
+            <a class="nav-link <?= $isActive('admin/penerimaan') ?>" href="<?= base_url('admin/penerimaan') ?>">
+                <i class="bi bi-arrow-down-circle me-2"></i>Pembelian
+            </a>
+            <a class="nav-link <?= $isActive('admin/pengeluaran') ?>" href="<?= base_url('admin/pengeluaran') ?>">
+                <i class="bi bi-arrow-up-circle me-2"></i>Penjualan
+            </a>
+            <a class="nav-link <?= $isActive('admin/laporan-stok') ?>" href="<?= base_url('admin/laporan-stok') ?>">
+                <i class="bi bi-table me-2"></i>Laporan Stok
+            </a>
+            <a class="nav-link <?= $isActive('admin/laba-rugi') ?>" href="<?= base_url('admin/laba-rugi') ?>">
+                <i class="bi bi-bar-chart me-2"></i>Laba Rugi
+            </a>
             <a class="nav-link " href="<?= base_url('admin/users') ?>?"><i class="bi bi-person-badge me-2"></i>Kelola Kurir</a>
         </nav>
     <?php endif; ?>
