@@ -106,7 +106,8 @@
             top: 70px;
             left: 0;
             width: 240px;
-            min-height: calc(100vh - 70px);
+            height: calc(100vh - 70px);
+            max-height: calc(100vh - 70px);
             background: white;
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
             overflow-y: auto;
@@ -122,7 +123,8 @@
                 width: 100%;
                 position: relative;
                 top: 0;
-                min-height: auto;
+                height: auto;
+                max-height: none;
             }
 
             .main-content {
