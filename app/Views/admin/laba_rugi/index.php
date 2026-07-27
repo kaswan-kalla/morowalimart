@@ -13,7 +13,7 @@
     <div class="container-fluid py-4">
         <!-- Kop surat hanya saat print -->
         <div class="print-kop">
-            <h2 class="text-center mb-1">UD. MOROWALMART</h2>
+            <h2 class="text-center mb-1">UD. MOROWALIMART</h2>
             <p class="text-center mb-1">Jl. Trans Sulawesi Bahodopi - Morowali</p>
             <hr class="my-2">
             <h4 class="text-center print-title">Laporan Laba Rugi</h4>
@@ -65,9 +65,9 @@
                             <tr>
                                 <th>No</th>
                                 <th>Outlet</th>
-                                <th>Total Penjualan</th>
-                                <th>HPP</th>
-                                <th>Laba / Rugi</th>
+                                <th class="text-end">Total Penjualan</th>
+                                <th class="text-end">HPP</th>
+                                <th class="text-end">Laba / Rugi</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -84,9 +84,9 @@
                                     <tr>
                                         <td><?= $no++ ?></td>
                                         <td><strong><?= htmlspecialchars($o['nama_lokasi']) ?></strong></td>
-                                        <td><?= number_format($o['total_penjualan'], 0, ',', '.') ?></td>
-                                        <td><?= number_format($o['total_hpp'], 0, ',', '.') ?></td>
-                                        <td class="fw-bold <?= $laba >= 0 ? 'text-success' : 'text-danger' ?>">
+                                        <td class="text-end"><?= number_format($o['total_penjualan'], 0, ',', '.') ?></td>
+                                        <td class="text-end"><?= number_format($o['total_hpp'], 0, ',', '.') ?></td>
+                                        <td class="text-end fw-bold <?= $laba >= 0 ? 'text-success' : 'text-danger' ?>">
                                             <?= number_format(abs($laba), 0, ',', '.') ?>
                                         </td>
                                         <td><span class="badge bg-<?= $laba >= 0 ? 'success' : 'danger' ?>"><?= $laba >= 0 ? 'Laba' : 'Rugi' ?></span></td>

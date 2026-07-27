@@ -84,6 +84,9 @@
             <a class="nav-link <?= $isActive('admin/pengeluaran') ?>" href="<?= base_url('admin/pengeluaran') ?>">
                 <i class="bi bi-arrow-up-circle me-2"></i>Penjualan
             </a>
+            <a class="nav-link <?= $isActive('admin/mutasi') ?>" href="<?= base_url('admin/mutasi') ?>">
+                <i class="bi bi-arrow-left-right me-2"></i>Mutasi Barang
+            </a>
             <a class="nav-link <?= $isActive('admin/laporan-stok') ?>" href="<?= base_url('admin/laporan-stok') ?>">
                 <i class="bi bi-table me-2"></i>Laporan Stok
             </a>

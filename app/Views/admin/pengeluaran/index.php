@@ -46,9 +46,9 @@
                                 <th>Tanggal</th>
                                 <th>Barang</th>
                                 <th>Lokasi</th>
-                                <th>Harga Jual</th>
-                                <th>Jumlah</th>
-                                <th>Total</th>
+                                <th class="text-end">Harga Jual</th>
+                                <th class="text-end">Jumlah</th>
+                                <th class="text-end">Total</th>
                                 <th>Keterangan</th>
                                 <th>Aksi</th>
                             </tr>
@@ -284,9 +284,9 @@
                 <td>${v.tanggal ? new Date(v.tanggal).toLocaleDateString('id-ID') : '-'}</td>
                 <td><strong>${escapeHtml(v.nama_barang)}</strong></td>
                 <td>${escapeHtml(v.nama_lokasi)}</td>
-                <td>${formatRupiah(v.harga_jual)}</td>
-                <td>${parseInt(v.jumlah).toLocaleString('id-ID')}</td>
-                <td>${formatRupiah(total)}</td>
+                <td class="text-end">${formatRupiah(v.harga_jual)}</td>
+                <td class="text-end">${parseInt(v.jumlah).toLocaleString('id-ID')}</td>
+                <td class="text-end">${formatRupiah(total)}</td>
                 <td>${escapeHtml(v.keterangan || '-')}</td>
                 <td>
                     <div class="btn-group btn-group-sm">

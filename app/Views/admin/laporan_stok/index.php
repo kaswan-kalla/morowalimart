@@ -42,16 +42,20 @@
                                     <th>Stok Akhir</th>
                                     <th>Harga Beli</th>
                                     <th>Harga Jual</th>
-                                    <th>Nilai Stok</th>
+                                    <th>Nilai Stok Beli</th>
+                                    <th>Nilai Stok Jual</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php $noG = 1;
-                                $totalNilaiG = 0; ?>
+                                $totalNilaiG = 0;
+                                $totalNilaiJualG = 0; ?>
                                 <?php foreach ($stokGlobal as $s): ?>
                                     <?php
                                     $nilaiG = (int)$s['stok'] * (float)$s['harga_beli'];
+                                    $nilaiJualG = (int)$s['stok'] * (float)$s['harga_jual'];
                                     $totalNilaiG += $nilaiG;
+                                    $totalNilaiJualG += $nilaiJualG;
                                     ?>
                                     <tr>
                                         <td><?= $noG++ ?></td>
@@ -67,13 +71,15 @@
                                         <td><?= number_format($s['harga_beli'], 0, ',', '.') ?></td>
                                         <td><?= number_format($s['harga_jual'], 0, ',', '.') ?></td>
                                         <td><?= number_format($nilaiG, 0, ',', '.') ?></td>
+                                        <td><?= number_format($nilaiJualG, 0, ',', '.') ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                             <tfoot class="table-light">
                                 <tr>
                                     <th colspan="8" class="text-end">Total Nilai Stok Global</th>
-                                    <th><strong><?= number_format($totalNilaiG, 0, ',', '.') ?></strong></th>
+                                    <th class="text-end"><strong><?= number_format($totalNilaiG, 0, ',', '.') ?></strong></th>
+                                    <th class="text-end"><strong><?= number_format($totalNilaiJualG, 0, ',', '.') ?></strong></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -105,16 +111,20 @@
                                         <th>Stok Akhir</th>
                                         <th>Harga Beli</th>
                                         <th>Harga Jual</th>
-                                        <th>Nilai Stok</th>
+                                        <th>Nilai Stok Beli</th>
+                                        <th>Nilai Stok Jual</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php $no = 1;
-                                    $totalNilai = 0; ?>
+                                    $totalNilai = 0;
+                                    $totalNilaiJual = 0; ?>
                                     <?php foreach ($stok as $s): ?>
                                         <?php
                                         $nilai = (int)$s['stok'] * (float)$s['harga_beli'];
+                                        $nilaiJual = (int)$s['stok'] * (float)$s['harga_jual'];
                                         $totalNilai += $nilai;
+                                        $totalNilaiJual += $nilaiJual;
                                         ?>
                                         <tr>
                                             <td><?= $no++ ?></td>
@@ -130,13 +140,15 @@
                                             <td><?= number_format($s['harga_beli'], 0, ',', '.') ?></td>
                                             <td><?= number_format($s['harga_jual'], 0, ',', '.') ?></td>
                                             <td><?= number_format($nilai, 0, ',', '.') ?></td>
+                                            <td><?= number_format($nilaiJual, 0, ',', '.') ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                                 <tfoot class="table-light">
                                     <tr>
                                         <th colspan="8" class="text-end">Total Nilai Stok</th>
-                                        <th><strong><?= number_format($totalNilai, 0, ',', '.') ?></strong></th>
+                                        <th class="text-end"><strong><?= number_format($totalNilai, 0, ',', '.') ?></strong></th>
+                                        <th class="text-end"><strong><?= number_format($totalNilaiJual, 0, ',', '.') ?></strong></th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -149,6 +161,12 @@
 </div>
 
 <style>
+    /* Rata kanan kolom angka (Total Masuk s/d Nilai Stok) */
+    .table thead th:nth-child(n+4),
+    .table tbody td:nth-child(n+4) {
+        text-align: right;
+    }
+
     .print-kop {
         display: none;
     }
