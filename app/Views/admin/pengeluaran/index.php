@@ -73,20 +73,20 @@
                 <div class="modal-body">
                     <input type="hidden" name="id" id="keluarId">
                     <div class="mb-3">
-                        <label class="form-label">Barang <span class="text-danger">*</span></label>
-                        <select name="id_barang" class="form-select" required>
-                            <option value="">-- Pilih Barang --</option>
-                            <?php foreach ($barang as $b): ?>
-                                <option value="<?= $b['id'] ?>" data-nama="<?= htmlspecialchars($b['nama_barang']) ?>"><?= htmlspecialchars($b['nama_barang']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label">Lokasi <span class="text-danger">*</span></label>
                         <select name="id_lokasi" class="form-select" required>
                             <option value="">-- Pilih Lokasi --</option>
                             <?php foreach ($lokasi as $l): ?>
                                 <option value="<?= $l['id'] ?>"><?= htmlspecialchars($l['nama_lokasi']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Barang <span class="text-danger">*</span></label>
+                        <select name="id_barang" class="form-select" required>
+                            <option value="">-- Pilih Barang --</option>
+                            <?php foreach ($barang as $b): ?>
+                                <option value="<?= $b['id'] ?>" data-nama="<?= htmlspecialchars($b['nama_barang']) ?>"><?= htmlspecialchars($b['nama_barang']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
