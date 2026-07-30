@@ -266,6 +266,9 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('pengeluaran/store', 'Admin\Pengeluaran::store');
     $routes->post('pengeluaran/update/(:num)', 'Admin\Pengeluaran::update/$1');
     $routes->post('pengeluaran/delete/(:num)', 'Admin\Pengeluaran::delete/$1');
+    $routes->get('pengeluaran/chart', 'Admin\Pengeluaran::chart');
+    $routes->get('pengeluaran/getHargaJual/(:num)', 'Admin\Pengeluaran::getHargaJual/$1');
+    $routes->get('pengeluaran/getStokLokasi/(:num)', 'Admin\Pengeluaran::getStokLokasi/$1');
 
     // Inventory - Mutasi Barang Antar Outlet
     $routes->get('mutasi', 'Admin\Mutasi::index');

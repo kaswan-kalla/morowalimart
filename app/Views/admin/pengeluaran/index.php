@@ -77,7 +77,7 @@
                         <select name="id_barang" class="form-select" required>
                             <option value="">-- Pilih Barang --</option>
                             <?php foreach ($barang as $b): ?>
-                                <option value="<?= $b['id'] ?>"><?= htmlspecialchars($b['nama_barang']) ?></option>
+                                <option value="<?= $b['id'] ?>" data-nama="<?= htmlspecialchars($b['nama_barang']) ?>"><?= htmlspecialchars($b['nama_barang']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -307,6 +307,7 @@
         $('input[name="tanggal"]').val(new Date().toISOString().split('T')[0]);
         $('#btnSubmitKeluar').text('Tambah Baru').removeClass('btn-warning').addClass('btn-primary');
         $('#btnAddNewKeluar').hide();
+        updateStokBarang();
         new bootstrap.Modal($('#keluarModal')).show();
     }
 
@@ -323,7 +324,27 @@
         $('textarea[name="keterangan"]').val(d.keterangan || '');
         $('#btnSubmitKeluar').text('Perbarui').removeClass('btn-primary').addClass('btn-warning');
         $('#btnAddNewKeluar').show();
+        updateStokBarang();
         new bootstrap.Modal($('#keluarModal')).show();
+    }
+
+    // Tampilkan stok akhir outlet terpilih pada option barang: "BERAS -> 10"
+    function updateStokBarang() {
+        var idLokasi = $('select[name="id_lokasi"]').val();
+        var $opts = $('select[name="id_barang"] option[value!=""]');
+        if (!idLokasi) {
+            $opts.each(function() {
+                $(this).text($(this).data('nama'));
+            });
+            return;
+        }
+        $.get('<?= base_url('admin/pengeluaran/getStokLokasi') ?>/' + idLokasi, function(res) {
+            if (!res.status) return;
+            $opts.each(function() {
+                var stok = res.stok[$(this).val()] || 0;
+                $(this).text($(this).data('nama') + ' -> ' + stok.toLocaleString('id-ID'));
+            });
+        });
     }
 
     // Rupiah formatting on input
@@ -410,6 +431,9 @@
     $(document).ready(function() {
         loadData();
         loadChart();
+
+        // Update label stok barang saat outlet dipilih
+        $('select[name="id_lokasi"]').on('change', updateStokBarang);
 
         // Auto-fill harga jual dari data pembelian terbaru
         $('select[name="id_barang"]').on('change', function() {
