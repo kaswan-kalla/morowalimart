@@ -18,6 +18,16 @@ class Penerimaan extends BaseController
         $this->model       = new PenerimaanModel();
         $this->barangModel = new BarangModel();
         $this->lokasiModel = new LokasiModel();
+        $this->ensureFeeColumn();
+    }
+
+    private function ensureFeeColumn()
+    {
+        $db = \Config\Database::connect();
+        $exists = $db->query("SELECT COUNT(*) as c FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'penerimaan' AND COLUMN_NAME = 'fee_outlet'")->getRow()->c;
+        if (!$exists) {
+            $db->query("ALTER TABLE penerimaan ADD COLUMN fee_outlet DECIMAL(14,2) NOT NULL DEFAULT 0 AFTER harga_jual");
+        }
     }
 
     public function index()
@@ -57,6 +67,7 @@ class Penerimaan extends BaseController
             'id_lokasi'  => 'required|numeric',
             'harga_beli' => 'required|numeric',
             'harga_jual' => 'required|numeric',
+            'fee_outlet' => 'permit_empty|numeric',
             'jumlah'     => 'required|numeric|greater_than[0]',
             'tanggal'    => 'required|valid_date',
         ])) {
@@ -71,6 +82,7 @@ class Penerimaan extends BaseController
             'id_lokasi'  => $this->request->getPost('id_lokasi'),
             'harga_beli' => str_replace(',', '', $this->request->getPost('harga_beli')),
             'harga_jual' => str_replace(',', '', $this->request->getPost('harga_jual')),
+            'fee_outlet' => str_replace(',', '', $this->request->getPost('fee_outlet')),
             'jumlah'     => str_replace(',', '', $this->request->getPost('jumlah')),
             'tanggal'    => $this->request->getPost('tanggal'),
             'keterangan' => $this->request->getPost('keterangan'),
@@ -90,6 +102,7 @@ class Penerimaan extends BaseController
             'id_lokasi'  => 'required|numeric',
             'harga_beli' => 'required|numeric',
             'harga_jual' => 'required|numeric',
+            'fee_outlet' => 'permit_empty|numeric',
             'jumlah'     => 'required|numeric|greater_than[0]',
             'tanggal'    => 'required|valid_date',
         ])) {
@@ -104,6 +117,7 @@ class Penerimaan extends BaseController
             'id_lokasi'  => $this->request->getPost('id_lokasi'),
             'harga_beli' => str_replace(',', '', $this->request->getPost('harga_beli')),
             'harga_jual' => str_replace(',', '', $this->request->getPost('harga_jual')),
+            'fee_outlet' => str_replace(',', '', $this->request->getPost('fee_outlet')),
             'jumlah'     => str_replace(',', '', $this->request->getPost('jumlah')),
             'tanggal'    => $this->request->getPost('tanggal'),
             'keterangan' => $this->request->getPost('keterangan'),

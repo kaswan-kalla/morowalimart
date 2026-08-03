@@ -93,6 +93,9 @@
             <a class="nav-link <?= $isActive('admin/laba-rugi') ?>" href="<?= base_url('admin/laba-rugi') ?>">
                 <i class="bi bi-bar-chart me-2"></i>Laba Rugi
             </a>
+            <a class="nav-link <?= $isActive('admin/laporan-fee') ?>" href="<?= base_url('admin/laporan-fee') ?>">
+                <i class="bi bi-cash-coin me-2"></i>Laporan Fee Outlet
+            </a>
             <a class="nav-link " href="<?= base_url('admin/users') ?>?"><i class="bi bi-person-badge me-2"></i>Kelola Kurir</a>
         </nav>
     <?php endif; ?>

@@ -371,6 +371,26 @@
         $('.number-format').each(function() {
             if (this.value) this.value = parseInt(this.value).toLocaleString('id-ID');
         });
+        // Konfirmasi jika tanggal bukan hari ini
+        let tgl = $('input[name="tanggal"]').val();
+        let today = new Date().toISOString().split('T')[0];
+        if (tgl && tgl !== today) {
+            Swal.fire({
+                title: 'Tanggal bukan hari ini?',
+                text: 'Data akan disimpan dengan tanggal ' + tgl,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Simpan',
+                cancelButtonText: 'Batal'
+            }).then(r => {
+                if (r.isConfirmed) saveCopyKeluar(data);
+            });
+        } else {
+            saveCopyKeluar(data);
+        }
+    }
+
+    function saveCopyKeluar(data) {
         $.post('<?= base_url('admin/pengeluaran/store') ?>', data, function(res) {
             if (res.status) {
                 showToast(res.message, 'success');
@@ -384,12 +404,46 @@
 
     $('#keluarForm').on('submit', function(e) {
         e.preventDefault();
+        let id = $('#keluarId').val();
+        if (id) {
+            // Konfirmasi sebelum update
+            Swal.fire({
+                title: 'Perbarui data?',
+                text: 'Data penjualan akan diperbarui',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Perbarui',
+                cancelButtonText: 'Batal'
+            }).then(r => {
+                if (r.isConfirmed) submitKeluar(id);
+            });
+        } else {
+            // Konfirmasi jika tanggal bukan hari ini
+            let tgl = $('input[name="tanggal"]').val();
+            let today = new Date().toISOString().split('T')[0];
+            if (tgl && tgl !== today) {
+                Swal.fire({
+                    title: 'Tanggal bukan hari ini?',
+                    text: 'Data akan disimpan dengan tanggal ' + tgl,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Simpan',
+                    cancelButtonText: 'Batal'
+                }).then(r => {
+                    if (r.isConfirmed) submitKeluar(id);
+                });
+            } else {
+                submitKeluar(id);
+            }
+        }
+    });
+
+    function submitKeluar(id) {
         $('.price-format, .number-format').each(function() {
             this.value = this.value.replace(/\./g, '');
         });
-        let id = $('#keluarId').val();
         let url = id ? '<?= base_url('admin/pengeluaran/update') ?>/' + id : '<?= base_url('admin/pengeluaran/store') ?>';
-        $.post(url, $(this).serialize(), function(res) {
+        $.post(url, $('#keluarForm').serialize(), function(res) {
             if (res.status) {
                 showToast(res.message, 'success');
                 bootstrap.Modal.getInstance($('#keluarModal')[0]).hide();
@@ -398,7 +452,7 @@
                 showToast(res.message, 'danger');
             }
         });
-    });
+    }
 
     function deleteData(id) {
         Swal.fire({

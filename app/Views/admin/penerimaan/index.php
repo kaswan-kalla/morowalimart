@@ -40,6 +40,7 @@
                                 <th class="text-end">Jumlah</th>
                                 <th class="text-end">Total Beli</th>
                                 <th class="text-end">Total Jual</th>
+                                <th class="text-end">Fee Outlet</th>
                                 <th>Keterangan</th>
                                 <th>Aksi</th>
                             </tr>
@@ -98,13 +99,19 @@
                             <input type="text" name="jumlah" class="form-control number-format" required>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label class="form-label">Fee Outlet</label>
+                            <input type="text" name="fee_outlet" class="form-control price-format">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Tanggal <span class="text-danger">*</span></label>
                             <input type="date" name="tanggal" class="form-control" required>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Keterangan</label>
-                        <textarea name="keterangan" class="form-control" rows="2"></textarea>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Keterangan</label>
+                            <input type="text" name="keterangan" class="form-control" placeholder="Opsional">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -197,8 +204,8 @@
             print-color-adjust: exact;
         }
 
-        .table th:nth-child(n+10),
-        .table td:nth-child(n+10) {
+        .table th:nth-child(n+11),
+        .table td:nth-child(n+11) {
             display: none;
         }
 
@@ -227,6 +234,7 @@
                 let totalBeli = parseInt(v.jumlah) * parseFloat(v.harga_beli);
                 let totalJual = parseInt(v.jumlah) * parseFloat(v.harga_jual);
                 let selisih = parseFloat(v.harga_jual) - parseFloat(v.harga_beli);
+                let fee = parseFloat(v.fee_outlet) || 0;
                 grandTotalBeli += totalBeli;
                 grandTotalJual += totalJual;
                 html += `<tr>
@@ -239,6 +247,7 @@
                 <td class="text-end">${parseInt(v.jumlah).toLocaleString('id-ID')}</td>
                 <td class="text-end">${formatRupiah(totalBeli)}</td>
                 <td class="text-end">${formatRupiah(totalJual)}</td>
+                <td class="text-end">${formatRupiah(fee)}</td>
                 <td>${escapeHtml(v.keterangan || '-')}</td>
                 <td>
                     <div class="btn-group btn-group-sm">
@@ -248,7 +257,7 @@
                 </td>
             </tr>`;
             });
-            $('#terimaBody').html(html || '<tr><td colspan="11" class="text-center">Tidak ada data</td></tr>');
+            $('#terimaBody').html(html || '<tr><td colspan="12" class="text-center">Tidak ada data</td></tr>');
 
             if (res.data.length) {
                 let potensiLaba = grandTotalJual - grandTotalBeli;
@@ -256,10 +265,10 @@
                     '<tr><th colspan="7" class="text-end">Grand Total</th>' +
                     '<th class="text-end">' + formatRupiah(grandTotalBeli) + '</th>' +
                     '<th class="text-end">' + formatRupiah(grandTotalJual) + '</th>' +
-                    '<th colspan="2"></th></tr>' +
+                    '<th></th><th colspan="2"></th></tr>' +
                     '<tr class="text-success" style="--bs-table-bg: #d1e7dd;">' +
                     '<td colspan="7" class="text-end fw-bold">Potensi Laba</td>' +
-                    '<td colspan="4" class="fw-bold text-end">' + formatRupiah(potensiLaba) + '</td></tr>'
+                    '<td colspan="5" class="fw-bold text-end">' + formatRupiah(potensiLaba) + '</td></tr>'
                 );
             } else {
                 $('#terimaFoot').html('');
@@ -286,6 +295,7 @@
         $('select[name="id_lokasi"]').val(d.id_lokasi);
         $('input[name="harga_beli"]').val(new Intl.NumberFormat('id-ID').format(d.harga_beli));
         $('input[name="harga_jual"]').val(new Intl.NumberFormat('id-ID').format(d.harga_jual));
+        $('input[name="fee_outlet"]').val(d.fee_outlet ? new Intl.NumberFormat('id-ID').format(d.fee_outlet) : '');
         $('input[name="jumlah"]').val(parseInt(d.jumlah).toLocaleString('id-ID'));
         $('input[name="tanggal"]').val(d.tanggal || '');
         $('textarea[name="keterangan"]').val(d.keterangan || '');
@@ -307,6 +317,26 @@
         $('.number-format').each(function() {
             if (this.value) this.value = parseInt(this.value).toLocaleString('id-ID');
         });
+        // Konfirmasi jika tanggal bukan hari ini
+        let tgl = $('input[name="tanggal"]').val();
+        let today = new Date().toISOString().split('T')[0];
+        if (tgl && tgl !== today) {
+            Swal.fire({
+                title: 'Tanggal bukan hari ini?',
+                text: 'Data akan disimpan dengan tanggal ' + tgl,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Simpan',
+                cancelButtonText: 'Batal'
+            }).then(r => {
+                if (r.isConfirmed) saveCopy(data);
+            });
+        } else {
+            saveCopy(data);
+        }
+    }
+
+    function saveCopy(data) {
         $.post('<?= base_url('admin/penerimaan/store') ?>', data, function(res) {
             if (res.status) {
                 showToast(res.message, 'success');
@@ -330,13 +360,47 @@
 
     $('#terimaForm').on('submit', function(e) {
         e.preventDefault();
+        let id = $('#terimaId').val();
+        if (id) {
+            // Konfirmasi sebelum update
+            Swal.fire({
+                title: 'Perbarui data?',
+                text: 'Data pembelian akan diperbarui',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Perbarui',
+                cancelButtonText: 'Batal'
+            }).then(r => {
+                if (r.isConfirmed) submitTerima(id);
+            });
+        } else {
+            // Konfirmasi jika tanggal bukan hari ini
+            let tgl = $('input[name="tanggal"]').val();
+            let today = new Date().toISOString().split('T')[0];
+            if (tgl && tgl !== today) {
+                Swal.fire({
+                    title: 'Tanggal bukan hari ini?',
+                    text: 'Data akan disimpan dengan tanggal ' + tgl,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Simpan',
+                    cancelButtonText: 'Batal'
+                }).then(r => {
+                    if (r.isConfirmed) submitTerima(id);
+                });
+            } else {
+                submitTerima(id);
+            }
+        }
+    });
+
+    function submitTerima(id) {
         // Remove formatting before submit
         $('.price-format, .number-format').each(function() {
             this.value = this.value.replace(/\./g, '');
         });
-        let id = $('#terimaId').val();
         let url = id ? '<?= base_url('admin/penerimaan/update') ?>/' + id : '<?= base_url('admin/penerimaan/store') ?>';
-        $.post(url, $(this).serialize(), function(res) {
+        $.post(url, $('#terimaForm').serialize(), function(res) {
             if (res.status) {
                 showToast(res.message, 'success');
                 bootstrap.Modal.getInstance($('#terimaModal')[0]).hide();
@@ -345,7 +409,7 @@
                 showToast(res.message, 'danger');
             }
         });
-    });
+    }
 
     function deleteData(id) {
         Swal.fire({

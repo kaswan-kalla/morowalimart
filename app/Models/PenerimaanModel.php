@@ -11,7 +11,7 @@ class PenerimaanModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-    protected $allowedFields    = ['id_barang', 'id_lokasi', 'harga_beli', 'harga_jual', 'jumlah', 'tanggal', 'keterangan'];
+    protected $allowedFields    = ['id_barang', 'id_lokasi', 'harga_beli', 'harga_jual', 'fee_outlet', 'jumlah', 'tanggal', 'keterangan'];
 
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
@@ -24,6 +24,7 @@ class PenerimaanModel extends Model
         'id_lokasi'  => 'required|numeric',
         'harga_beli' => 'required|numeric|greater_than_equal_to[0]',
         'harga_jual' => 'required|numeric|greater_than_equal_to[0]',
+        'fee_outlet' => 'permit_empty|numeric',
         'jumlah'     => 'required|numeric|greater_than[0]',
         'tanggal'    => 'required|valid_date',
     ];

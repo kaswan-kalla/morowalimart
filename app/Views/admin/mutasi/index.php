@@ -269,12 +269,46 @@
 
     $('#mutasiForm').on('submit', function(e) {
         e.preventDefault();
+        let id = $('#mutasiId').val();
+        if (id) {
+            // Konfirmasi sebelum update
+            Swal.fire({
+                title: 'Perbarui data?',
+                text: 'Data mutasi akan diperbarui',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Perbarui',
+                cancelButtonText: 'Batal'
+            }).then(r => {
+                if (r.isConfirmed) submitMutasi(id);
+            });
+        } else {
+            // Konfirmasi jika tanggal bukan hari ini
+            let tgl = $('input[name="tanggal"]').val();
+            let today = new Date().toISOString().split('T')[0];
+            if (tgl && tgl !== today) {
+                Swal.fire({
+                    title: 'Tanggal bukan hari ini?',
+                    text: 'Data akan disimpan dengan tanggal ' + tgl,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Simpan',
+                    cancelButtonText: 'Batal'
+                }).then(r => {
+                    if (r.isConfirmed) submitMutasi(id);
+                });
+            } else {
+                submitMutasi(id);
+            }
+        }
+    });
+
+    function submitMutasi(id) {
         $('.number-format').each(function() {
             this.value = this.value.replace(/\./g, '');
         });
-        let id = $('#mutasiId').val();
         let url = id ? '<?= base_url('admin/mutasi/update') ?>/' + id : '<?= base_url('admin/mutasi/store') ?>';
-        $.post(url, $(this).serialize(), function(res) {
+        $.post(url, $('#mutasiForm').serialize(), function(res) {
             if (res.status) {
                 showToast(res.message, 'success');
                 bootstrap.Modal.getInstance($('#mutasiModal')[0]).hide();
@@ -287,7 +321,7 @@
                 });
             }
         });
-    });
+    }
 
     function deleteData(id) {
         Swal.fire({

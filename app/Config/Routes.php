@@ -283,6 +283,9 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
 
     // Inventory - Laba Rugi
     $routes->get('laba-rugi', 'Admin\LabaRugi::index');
+
+    // Inventory - Laporan Fee Outlet
+    $routes->get('laporan-fee', 'Admin\LaporanFee::index');
 });
 
 // === COURIER DASHBOARD ===

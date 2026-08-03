@@ -5,7 +5,9 @@
 <?php
 /** @var float $total_penjualan */
 /** @var float $total_hpp */
+/** @var float $total_fee */
 /** @var float $laba_kotor */
+/** @var float $laba_bersih */
 /** @var array $perOutlet */
 ?>
 
@@ -26,7 +28,7 @@
 
         <!-- Ringkasan -->
         <div class="row g-3 mb-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card shadow-sm border-0 bg-success text-white">
                     <div class="card-body">
                         <h6 class="card-title mb-1"><i class="bi bi-arrow-up-circle me-1"></i>Total Penjualan</h6>
@@ -34,7 +36,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card shadow-sm border-0 bg-danger text-white">
                     <div class="card-body">
                         <h6 class="card-title mb-1"><i class="bi bi-arrow-down-circle me-1"></i>HPP (Harga Pokok Penjualan)</h6>
@@ -42,12 +44,20 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 bg-<?= $laba_kotor >= 0 ? 'primary' : 'warning' ?> text-white">
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 bg-warning text-white">
                     <div class="card-body">
-                        <h6 class="card-title mb-1"><i class="bi bi-graph-up-arrow me-1"></i>Laba / Rugi Kotor</h6>
-                        <h3 class="mb-0"><?= number_format(abs($laba_kotor), 0, ',', '.') ?></h3>
-                        <small><?= $laba_kotor >= 0 ? 'Laba' : 'Rugi' ?></small>
+                        <h6 class="card-title mb-1"><i class="bi bi-cash-coin me-1"></i>Fee Outlet</h6>
+                        <h3 class="mb-0"><?= number_format($total_fee, 0, ',', '.') ?></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 bg-<?= $laba_bersih >= 0 ? 'primary' : 'secondary' ?> text-white">
+                    <div class="card-body">
+                        <h6 class="card-title mb-1"><i class="bi bi-graph-up-arrow me-1"></i>Laba / Rugi Bersih</h6>
+                        <h3 class="mb-0"><?= number_format(abs($laba_bersih), 0, ',', '.') ?></h3>
+                        <small><?= $laba_bersih >= 0 ? 'Laba' : 'Rugi' ?></small>
                     </div>
                 </div>
             </div>
@@ -67,6 +77,7 @@
                                 <th>Outlet</th>
                                 <th class="text-end">Total Penjualan</th>
                                 <th class="text-end">HPP</th>
+                                <th class="text-end">Fee Outlet</th>
                                 <th class="text-end">Laba / Rugi</th>
                                 <th>Status</th>
                             </tr>
@@ -74,18 +85,19 @@
                         <tbody>
                             <?php if (empty($perOutlet)): ?>
                                 <tr>
-                                    <td colspan="6" class="text-center">Belum ada data</td>
+                                    <td colspan="7" class="text-center">Belum ada data</td>
                                 </tr>
                             <?php else: ?>
                                 <?php $no = 1; ?>
                                 <?php foreach ($perOutlet as $o):
-                                    $laba = $o['total_penjualan'] - $o['total_hpp'];
+                                    $laba = $o['total_penjualan'] - $o['total_hpp'] - $o['total_fee'];
                                 ?>
                                     <tr>
                                         <td><?= $no++ ?></td>
                                         <td><strong><?= htmlspecialchars($o['nama_lokasi']) ?></strong></td>
                                         <td class="text-end"><?= number_format($o['total_penjualan'], 0, ',', '.') ?></td>
                                         <td class="text-end"><?= number_format($o['total_hpp'], 0, ',', '.') ?></td>
+                                        <td class="text-end"><?= number_format($o['total_fee'], 0, ',', '.') ?></td>
                                         <td class="text-end fw-bold <?= $laba >= 0 ? 'text-success' : 'text-danger' ?>">
                                             <?= number_format(abs($laba), 0, ',', '.') ?>
                                         </td>
@@ -94,6 +106,30 @@
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
+                        <?php if (!empty($perOutlet)): ?>
+                            <?php
+                            $gtPenjualan = 0;
+                            $gtHpp = 0;
+                            $gtFee = 0;
+                            $gtLaba = 0;
+                            foreach ($perOutlet as $o) {
+                                $gtPenjualan += $o['total_penjualan'];
+                                $gtHpp += $o['total_hpp'];
+                                $gtFee += $o['total_fee'];
+                                $gtLaba += $o['total_penjualan'] - $o['total_hpp'] - $o['total_fee'];
+                            }
+                            ?>
+                            <tfoot class="table-light fw-bold">
+                                <tr>
+                                    <th colspan="2" class="text-end">Grand Total</th>
+                                    <th class="text-end"><?= number_format($gtPenjualan, 0, ',', '.') ?></th>
+                                    <th class="text-end"><?= number_format($gtHpp, 0, ',', '.') ?></th>
+                                    <th class="text-end"><?= number_format($gtFee, 0, ',', '.') ?></th>
+                                    <th class="text-end <?= $gtLaba >= 0 ? 'text-success' : 'text-danger' ?>"><?= number_format(abs($gtLaba), 0, ',', '.') ?></th>
+                                    <th><span class="badge bg-<?= $gtLaba >= 0 ? 'success' : 'danger' ?>"><?= $gtLaba >= 0 ? 'Laba' : 'Rugi' ?></span></th>
+                                </tr>
+                            </tfoot>
+                        <?php endif; ?>
                     </table>
                 </div>
             </div>
@@ -164,7 +200,8 @@
         .bg-success,
         .bg-danger,
         .bg-primary,
-        .bg-warning {
+        .bg-warning,
+        .bg-secondary {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
