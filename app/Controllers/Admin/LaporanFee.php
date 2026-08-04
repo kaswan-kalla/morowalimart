@@ -28,15 +28,11 @@ class LaporanFee extends BaseController
     {
         $db = \Config\Database::connect();
 
-        // Filter periode penjualan
-        $dari = $this->request->getGet('dari');
-        $sampai = $this->request->getGet('sampai');
-        $periodeSql = '';
-        $params = [];
-        if ($dari && $sampai) {
-            $periodeSql = ' AND p.tanggal >= ? AND p.tanggal <= ?';
-            $params = [$dari, $sampai];
-        }
+        // Filter periode penjualan (bulan & tahun, default bulan berjalan)
+        $bulan = $this->request->getGet('bulan') ?: date('m');
+        $tahun = $this->request->getGet('tahun') ?: date('Y');
+        $periodeSql = ' AND MONTH(p.tanggal) = ? AND YEAR(p.tanggal) = ?';
+        $params = [$bulan, $tahun];
 
         // Fee terbaru per barang dari data pembelian (penerimaan)
         $feeRows = $db->query(
@@ -77,8 +73,8 @@ class LaporanFee extends BaseController
         return view('admin/laporan_fee/index', [
             'meta_title' => 'Laporan Fee Outlet',
             'perOutlet'  => $perOutlet,
-            'dari'       => $dari,
-            'sampai'     => $sampai,
+            'bulan'      => $bulan,
+            'tahun'      => $tahun,
         ]);
     }
 }

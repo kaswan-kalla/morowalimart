@@ -29,18 +29,18 @@
         <!-- Ringkasan -->
         <div class="row g-3 mb-4">
             <div class="col-md-3">
-                <div class="card shadow-sm border-0 bg-success text-white">
-                    <div class="card-body">
-                        <h6 class="card-title mb-1"><i class="bi bi-arrow-up-circle me-1"></i>Total Penjualan</h6>
-                        <h3 class="mb-0"><?= number_format($total_penjualan, 0, ',', '.') ?></h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
                 <div class="card shadow-sm border-0 bg-danger text-white">
                     <div class="card-body">
                         <h6 class="card-title mb-1"><i class="bi bi-arrow-down-circle me-1"></i>HPP (Harga Pokok Penjualan)</h6>
                         <h3 class="mb-0"><?= number_format($total_hpp, 0, ',', '.') ?></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 bg-info text-white">
+                    <div class="card-body">
+                        <h6 class="card-title mb-1"><i class="bi bi-graph-up me-1"></i>Laba Kotor</h6>
+                        <h3 class="mb-0"><?= number_format($laba_kotor, 0, ',', '.') ?></h3>
                     </div>
                 </div>
             </div>
@@ -77,26 +77,31 @@
                                 <th>Outlet</th>
                                 <th class="text-end">Total Penjualan</th>
                                 <th class="text-end">HPP</th>
+                                <th class="text-end">Laba Kotor</th>
                                 <th class="text-end">Fee Outlet</th>
-                                <th class="text-end">Laba / Rugi</th>
+                                <th class="text-end">Laba Bersih</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($perOutlet)): ?>
                                 <tr>
-                                    <td colspan="7" class="text-center">Belum ada data</td>
+                                    <td colspan="8" class="text-center">Belum ada data</td>
                                 </tr>
                             <?php else: ?>
                                 <?php $no = 1; ?>
                                 <?php foreach ($perOutlet as $o):
-                                    $laba = $o['total_penjualan'] - $o['total_hpp'] - $o['total_fee'];
+                                    $labaKotor = $o['total_penjualan'] - $o['total_hpp'];
+                                    $laba = $labaKotor - $o['total_fee'];
                                 ?>
                                     <tr>
                                         <td><?= $no++ ?></td>
                                         <td><strong><?= htmlspecialchars($o['nama_lokasi']) ?></strong></td>
                                         <td class="text-end"><?= number_format($o['total_penjualan'], 0, ',', '.') ?></td>
                                         <td class="text-end"><?= number_format($o['total_hpp'], 0, ',', '.') ?></td>
+                                        <td class="text-end <?= $labaKotor >= 0 ? 'text-success' : 'text-danger' ?>">
+                                            <?= number_format(abs($labaKotor), 0, ',', '.') ?>
+                                        </td>
                                         <td class="text-end"><?= number_format($o['total_fee'], 0, ',', '.') ?></td>
                                         <td class="text-end fw-bold <?= $laba >= 0 ? 'text-success' : 'text-danger' ?>">
                                             <?= number_format(abs($laba), 0, ',', '.') ?>
@@ -110,11 +115,13 @@
                             <?php
                             $gtPenjualan = 0;
                             $gtHpp = 0;
+                            $gtLabaKotor = 0;
                             $gtFee = 0;
                             $gtLaba = 0;
                             foreach ($perOutlet as $o) {
                                 $gtPenjualan += $o['total_penjualan'];
                                 $gtHpp += $o['total_hpp'];
+                                $gtLabaKotor += $o['total_penjualan'] - $o['total_hpp'];
                                 $gtFee += $o['total_fee'];
                                 $gtLaba += $o['total_penjualan'] - $o['total_hpp'] - $o['total_fee'];
                             }
@@ -124,6 +131,7 @@
                                     <th colspan="2" class="text-end">Grand Total</th>
                                     <th class="text-end"><?= number_format($gtPenjualan, 0, ',', '.') ?></th>
                                     <th class="text-end"><?= number_format($gtHpp, 0, ',', '.') ?></th>
+                                    <th class="text-end <?= $gtLabaKotor >= 0 ? 'text-success' : 'text-danger' ?>"><?= number_format(abs($gtLabaKotor), 0, ',', '.') ?></th>
                                     <th class="text-end"><?= number_format($gtFee, 0, ',', '.') ?></th>
                                     <th class="text-end <?= $gtLaba >= 0 ? 'text-success' : 'text-danger' ?>"><?= number_format(abs($gtLaba), 0, ',', '.') ?></th>
                                     <th><span class="badge bg-<?= $gtLaba >= 0 ? 'success' : 'danger' ?>"><?= $gtLaba >= 0 ? 'Laba' : 'Rugi' ?></span></th>
@@ -201,6 +209,7 @@
         .bg-danger,
         .bg-primary,
         .bg-warning,
+        .bg-info,
         .bg-secondary {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;

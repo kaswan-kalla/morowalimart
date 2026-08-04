@@ -4,8 +4,9 @@
 <?= $this->include('layouts/sidebar') ?>
 <?php
 /** @var array $perOutlet */
-/** @var string|null $dari */
-/** @var string|null $sampai */
+/** @var string $bulan */
+/** @var string $tahun */
+$namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 ?>
 
 <div class="main-content">
@@ -24,24 +25,31 @@
             </div>
         </div>
 
-        <!-- Filter periode penjualan -->
+        <!-- Filter periode bulan/tahun -->
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <form method="get" class="row g-2 align-items-end">
                     <div class="col-md-3">
-                        <label class="form-label mb-1">Dari Tanggal</label>
-                        <input type="date" name="dari" class="form-control" value="<?= htmlspecialchars($dari ?? '') ?>">
+                        <label class="form-label mb-1">Bulan</label>
+                        <select name="bulan" class="form-select">
+                            <?php foreach ($namaBulan as $i => $n): ?>
+                                <?php $val = str_pad($i + 1, 2, '0', STR_PAD_LEFT); ?>
+                                <option value="<?= $val ?>" <?= $bulan == $val ? 'selected' : '' ?>><?= $n ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label mb-1">Sampai Tanggal</label>
-                        <input type="date" name="sampai" class="form-control" value="<?= htmlspecialchars($sampai ?? '') ?>">
+                        <label class="form-label mb-1">Tahun</label>
+                        <select name="tahun" class="form-select">
+                            <?php for ($i = (int)date('Y'); $i >= (int)date('Y') - 5; $i--): ?>
+                                <option value="<?= $i ?>" <?= (int)$tahun == $i ? 'selected' : '' ?>><?= $i ?></option>
+                            <?php endfor; ?>
+                        </select>
                     </div>
                     <div class="col-md-6">
                         <button type="submit" class="btn btn-primary me-1"><i class="bi bi-funnel me-1"></i>Filter</button>
                         <a href="<?= base_url('admin/laporan-fee') ?>" class="btn btn-outline-secondary"><i class="bi bi-x-circle me-1"></i>Reset</a>
-                        <?php if ($dari && $sampai): ?>
-                            <span class="badge bg-info text-dark ms-2"><?= date('d/m/Y', strtotime($dari)) ?> s/d <?= date('d/m/Y', strtotime($sampai)) ?></span>
-                        <?php endif; ?>
+                        <span class="badge bg-info text-dark ms-2"><?= $namaBulan[(int)$bulan - 1] ?> <?= $tahun ?></span>
                     </div>
                 </form>
             </div>
