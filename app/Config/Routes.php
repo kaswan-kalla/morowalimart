@@ -284,6 +284,9 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     // Inventory - Laba Rugi
     $routes->get('laba-rugi', 'Admin\LabaRugi::index');
 
+    // Inventory - Laba Bulanan
+    $routes->get('laba-bulanan', 'Admin\LabaBulanan::index');
+
     // Inventory - Laporan Fee Outlet
     $routes->get('laporan-fee', 'Admin\LaporanFee::index');
 });

@@ -93,6 +93,9 @@
             <a class="nav-link <?= $isActive('admin/laba-rugi') ?>" href="<?= base_url('admin/laba-rugi') ?>">
                 <i class="bi bi-bar-chart me-2"></i>Laba Rugi
             </a>
+            <a class="nav-link <?= $isActive('admin/laba-bulanan') ?>" href="<?= base_url('admin/laba-bulanan') ?>">
+                <i class="bi bi-calendar-month me-2"></i>Laba Bulanan
+            </a>
             <a class="nav-link <?= $isActive('admin/laporan-fee') ?>" href="<?= base_url('admin/laporan-fee') ?>">
                 <i class="bi bi-cash-coin me-2"></i>Fee Outlet
             </a>
