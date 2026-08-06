@@ -20,7 +20,8 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">Mutasi Barang Antar Outlet</h4>
             <div>
-                <button class="btn btn-outline-primary me-1" onclick="window.print()"><i class="bi bi-printer"></i> Cetak</button>
+                <button class="btn btn-outline-primary me-1" onclick="openPrintPreview()"><i class="bi bi-printer"></i> Cetak</button>
+                <button class="btn btn-outline-success me-1" onclick="copyReportImage()"><i class="bi bi-clipboard"></i> Salin Gambar</button>
                 <button class="btn btn-primary" onclick="showForm()"><i class="bi bi-plus"></i> Tambah</button>
             </div>
         </div>
@@ -124,7 +125,8 @@
 
     @media print {
         @page {
-            margin: 15mm;
+            size: 21cm 33cm;
+            margin: 10mm;
         }
 
         .sidebar,
@@ -311,7 +313,13 @@
         $.post(url, $('#mutasiForm').serialize(), function(res) {
             if (res.status) {
                 showToast(res.message, 'success');
-                bootstrap.Modal.getInstance($('#mutasiModal')[0]).hide();
+                if (id) {
+                    bootstrap.Modal.getInstance($('#mutasiModal')[0]).hide();
+                } else {
+                    // Tambah baru: modal tetap terbuka, hapus hanya barang & jumlah
+                    $('#mutasiForm select[name="id_barang"]').val('');
+                    $('#mutasiForm input[name="jumlah"]').val('');
+                }
                 loadData();
             } else {
                 showToast(res.message, 'danger');

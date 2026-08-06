@@ -23,7 +23,8 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0"></h4>
-            <button class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer"></i> Cetak</button>
+            <button class="btn btn-outline-primary" onclick="openPrintPreview()"><i class="bi bi-printer"></i> Cetak</button>
+            <button class="btn btn-outline-success" onclick="copyReportImage()"><i class="bi bi-clipboard"></i> Salin Gambar</button>
         </div>
 
         <!-- Ringkasan -->
@@ -156,7 +157,8 @@
 
     @media print {
         @page {
-            margin: 15mm;
+            size: 21cm 33cm;
+            margin: 10mm;
         }
 
         .sidebar,

@@ -21,7 +21,9 @@ class Auth extends BaseController
      */
     public function login()
     {
-        if (is_logged_in()) return redirect()->to('home');
+        if (is_logged_in()) {
+            return redirect()->to(is_admin() ? 'admin/dashboard' : 'home');
+        }
         return view('layout/marketplace_content', ['content' => 'auth', 'subview' => 'login', 'meta_title' => 'Login']);
     }
 
@@ -78,7 +80,12 @@ class Auth extends BaseController
         // Regenerate session ID untuk keamanan
         $this->session->regenerate();
 
-        $redirect = $this->session->get('redirect_url') ?: base_url();
+        // Admin selalu diarahkan ke panel admin, user lain ke halaman asal/beranda
+        if ($user['role'] === 'admin') {
+            $redirect = base_url('admin/dashboard');
+        } else {
+            $redirect = $this->session->get('redirect_url') ?: base_url();
+        }
         $this->session->remove('redirect_url');
 
         return $this->response->setJSON([
@@ -93,7 +100,9 @@ class Auth extends BaseController
      */
     public function register()
     {
-        if (is_logged_in()) return redirect()->to('home');
+        if (is_logged_in()) {
+            return redirect()->to(is_admin() ? 'admin/dashboard' : 'home');
+        }
         return view('layout/marketplace_content', ['content' => 'auth', 'subview' => 'register', 'meta_title' => 'Daftar Akun']);
     }
 

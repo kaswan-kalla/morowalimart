@@ -4,6 +4,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- html2canvas untuk screenshot -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
     // Base URL for JS
@@ -113,7 +115,120 @@
     function formatRupiah(angka) {
         return 'Rp ' + new Intl.NumberFormat('id-ID').format(angka);
     }
+
+    // Sidebar auto-hide mobile (hanya jika sidebar ada)
+    if ($('.sidebar').length) {
+        if (!$('#sidebarBackdrop').length) {
+            $('body').append('<div class="sidebar-backdrop" id="sidebarBackdrop"></div>');
+        }
+
+        $('#sidebarToggle').on('click', function() {
+            $('.sidebar').addClass('show');
+            $('#sidebarBackdrop').addClass('show');
+        });
+
+        $('#sidebarBackdrop').on('click', function() {
+            $('.sidebar').removeClass('show');
+            $(this).removeClass('show');
+        });
+    }
+
+    // Preview cetak F4 (mobile: tombol jadi screenshot)
+    function openPrintPreview() {
+        const source = document.querySelector('.main-content');
+        const paper = document.getElementById('printPreviewPaper');
+        if (source) {
+            paper.innerHTML = source.innerHTML;
+        }
+        // Judul modal = nama menu sidebar yang aktif
+        const menuName = ($('.sidebar .nav-link.active').text().trim()) ||
+            (document.querySelector('.main-content h4') ? document.querySelector('.main-content h4').textContent.trim() : '') ||
+            'Preview';
+        $('#printPreviewModal .modal-title').html('<i class="bi bi-file-earmark-text me-2"></i>' + menuName);
+        $('#printPreviewModal').modal('show');
+    }
+
+    // Tombol Cetak di modal preview: langsung buka dialog print F4
+    $(document).on('click', '#previewPrintBtn', function() {
+        window.print();
+    });
+
+    // Salin seluruh laporan (view cetak kertas putih, tanpa ukuran kertas) ke clipboard
+    function copyReportImage() {
+        if (typeof html2canvas === 'undefined') {
+            showToast('Gagal memuat html2canvas, periksa koneksi', 'error');
+            return;
+        }
+        const source = document.querySelector('.main-content');
+        if (!source) {
+            return;
+        }
+        const wrapper = document.createElement('div');
+        wrapper.className = 'print-preview';
+        wrapper.style.position = 'fixed';
+        wrapper.style.left = '-9999px';
+        wrapper.style.top = '0';
+        wrapper.style.width = source.offsetWidth + 'px';
+        const clone = source.cloneNode(true);
+        clone.className += ' paper paper-capture';
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+
+        html2canvas(wrapper.querySelector('.paper'), {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        }).then(function(canvas) {
+            wrapper.remove();
+            // Salin gambar ke clipboard agar bisa paste di WhatsApp
+            canvas.toBlob(function(blob) {
+                if (blob && navigator.clipboard && window.ClipboardItem) {
+                    navigator.clipboard.write([new ClipboardItem({
+                        'image/png': blob
+                    })]).then(function() {
+                        showToast('Gambar disalin, silakan paste di WhatsApp', 'success');
+                    }).catch(function() {
+                        downloadCanvas(canvas);
+                    });
+                } else {
+                    downloadCanvas(canvas);
+                }
+            }, 'image/png');
+        }).catch(function(err) {
+            wrapper.remove();
+            showToast('Gagal mengambil screenshot: ' + err.message, 'error');
+        });
+    }
+
+    // Fallback: unduh PNG jika clipboard tidak tersedia
+    function downloadCanvas(canvas) {
+        const link = document.createElement('a');
+        link.download = 'screenshot-' + Date.now() + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Clipboard tidak tersedia, gambar diunduh', 'info');
+    }
 </script>
+
+<!-- Modal Preview Cetak F4 -->
+<div class="modal fade" id="printPreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content print-preview">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-file-earmark-text me-2"></i>Preview F4</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-secondary">
+                <div class="paper" id="printPreviewPaper"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="previewPrintBtn">
+                    <i class="bi bi-printer me-1"></i>Cetak
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?= $this->renderSection('scripts') ?>
 

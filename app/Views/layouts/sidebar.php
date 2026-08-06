@@ -1,3 +1,8 @@
+<!-- Tombol toggle sidebar (mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" type="button" title="Menu">
+    <i class="bi bi-list"></i>
+</button>
+
 <!-- Sidebar untuk Dashboard Seller/Admin -->
 <div class="sidebar py-3">
     <?php
@@ -33,6 +38,37 @@
             <a class="nav-link <?= $isActive('admin/dashboard') ?>" href="<?= base_url('admin/dashboard') ?>">
                 <i class="bi bi-speedometer2 me-2"></i>Dashboard
             </a>
+            <li class="nav-item">
+                <h6 class="px-3 text-muted text-uppercase small mt-3 mb-2">Inventori</h6>
+            </li>
+            <a class="nav-link <?= $isActive('admin/barang') ?>" href="<?= base_url('admin/barang') ?>">
+                <i class="bi bi-box-seam me-2"></i>Data Barang
+            </a>
+            <a class="nav-link <?= $isActive('admin/lokasi') ?>" href="<?= base_url('admin/lokasi') ?>">
+                <i class="bi bi-geo-alt me-2"></i>Lokasi
+            </a>
+            <a class="nav-link <?= $isActive('admin/penerimaan') ?>" href="<?= base_url('admin/penerimaan') ?>">
+                <i class="bi bi-arrow-down-circle me-2"></i>Pembelian
+            </a>
+            <a class="nav-link <?= $isActive('admin/pengeluaran') ?>" href="<?= base_url('admin/pengeluaran') ?>">
+                <i class="bi bi-arrow-up-circle me-2"></i>Penjualan
+            </a>
+            <a class="nav-link <?= $isActive('admin/mutasi') ?>" href="<?= base_url('admin/mutasi') ?>">
+                <i class="bi bi-arrow-left-right me-2"></i>Mutasi Barang
+            </a>
+            <a class="nav-link <?= $isActive('admin/laporan-stok') ?>" href="<?= base_url('admin/laporan-stok') ?>">
+                <i class="bi bi-table me-2"></i>Laporan Stok
+            </a>
+            <a class="nav-link <?= $isActive('admin/laba-rugi') ?>" href="<?= base_url('admin/laba-rugi') ?>">
+                <i class="bi bi-bar-chart me-2"></i>Laba Rugi
+            </a>
+            <a class="nav-link <?= $isActive('admin/laba-bulanan') ?>" href="<?= base_url('admin/laba-bulanan') ?>">
+                <i class="bi bi-calendar-month me-2"></i>Laba Bulanan
+            </a>
+            <a class="nav-link <?= $isActive('admin/laporan-fee') ?>" href="<?= base_url('admin/laporan-fee') ?>">
+                <i class="bi bi-cash-coin me-2"></i>Fee Outlet
+            </a>
+            <a class="nav-link " href="<?= base_url('admin/users') ?>?"><i class="bi bi-person-badge me-2"></i>Kelola Kurir</a>
             <a class="nav-link <?= $isActive('admin/users') ?>" href="<?= base_url('admin/users') ?>">
                 <i class="bi bi-people me-2"></i>Manajemen User
             </a>
@@ -69,37 +105,6 @@
             <a class="nav-link" href="<?= base_url('admin/investments') ?>">
                 <i class="bi bi-cash-stack me-2"></i>Penambahan Modal
             </a>
-            <li class="nav-item">
-                <h6 class="px-3 text-muted text-uppercase small mt-3 mb-2">Inventori</h6>
-            </li>
-            <a class="nav-link <?= $isActive('admin/barang') ?>" href="<?= base_url('admin/barang') ?>">
-                <i class="bi bi-box-seam me-2"></i>Data Barang
-            </a>
-            <a class="nav-link <?= $isActive('admin/lokasi') ?>" href="<?= base_url('admin/lokasi') ?>">
-                <i class="bi bi-geo-alt me-2"></i>Lokasi
-            </a>
-            <a class="nav-link <?= $isActive('admin/penerimaan') ?>" href="<?= base_url('admin/penerimaan') ?>">
-                <i class="bi bi-arrow-down-circle me-2"></i>Pembelian
-            </a>
-            <a class="nav-link <?= $isActive('admin/pengeluaran') ?>" href="<?= base_url('admin/pengeluaran') ?>">
-                <i class="bi bi-arrow-up-circle me-2"></i>Penjualan
-            </a>
-            <a class="nav-link <?= $isActive('admin/mutasi') ?>" href="<?= base_url('admin/mutasi') ?>">
-                <i class="bi bi-arrow-left-right me-2"></i>Mutasi Barang
-            </a>
-            <a class="nav-link <?= $isActive('admin/laporan-stok') ?>" href="<?= base_url('admin/laporan-stok') ?>">
-                <i class="bi bi-table me-2"></i>Laporan Stok
-            </a>
-            <a class="nav-link <?= $isActive('admin/laba-rugi') ?>" href="<?= base_url('admin/laba-rugi') ?>">
-                <i class="bi bi-bar-chart me-2"></i>Laba Rugi
-            </a>
-            <a class="nav-link <?= $isActive('admin/laba-bulanan') ?>" href="<?= base_url('admin/laba-bulanan') ?>">
-                <i class="bi bi-calendar-month me-2"></i>Laba Bulanan
-            </a>
-            <a class="nav-link <?= $isActive('admin/laporan-fee') ?>" href="<?= base_url('admin/laporan-fee') ?>">
-                <i class="bi bi-cash-coin me-2"></i>Fee Outlet
-            </a>
-            <a class="nav-link " href="<?= base_url('admin/users') ?>?"><i class="bi bi-person-badge me-2"></i>Kelola Kurir</a>
         </nav>
     <?php endif; ?>
 

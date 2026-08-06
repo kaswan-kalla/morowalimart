@@ -20,8 +20,9 @@ $namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'A
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <button class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer"></i> Cetak</button>
+            <div class="ms-auto">
+                <button class="btn btn-outline-primary" onclick="openPrintPreview()"><i class="bi bi-printer"></i> Cetak</button>
+                <button class="btn btn-outline-success" onclick="copyReportImage()"><i class="bi bi-clipboard"></i> Salin Gambar</button>
             </div>
         </div>
 
@@ -200,7 +201,8 @@ $namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'A
 
     @media print {
         @page {
-            margin: 15mm;
+            size: 21cm 33cm;
+            margin: 10mm;
         }
 
         .sidebar,

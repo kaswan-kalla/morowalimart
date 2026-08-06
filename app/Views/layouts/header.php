@@ -118,13 +118,57 @@
             margin-left: 240px;
         }
 
+        .sidebar-toggle {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
+                display: none;
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 280px;
+                height: calc(100vh - 70px);
+                max-height: calc(100vh - 70px);
+                z-index: 1051;
+                box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+            }
+
+            .sidebar.show {
+                display: block;
+            }
+
+            .sidebar-backdrop {
+                display: none;
+                position: fixed;
+                top: 70px;
+                left: 0;
                 width: 100%;
-                position: relative;
-                top: 0;
-                height: auto;
-                max-height: none;
+                height: calc(100vh - 70px);
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1050;
+            }
+
+            .sidebar-backdrop.show {
+                display: block;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+                position: fixed;
+                top: 78px;
+                left: 10px;
+                z-index: 1040;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                border: none;
+                border-radius: 10px;
+                background: var(--primary);
+                color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             }
 
             .main-content {
@@ -150,6 +194,73 @@
             top: 80px;
             right: 20px;
             z-index: 9999;
+        }
+
+        /* Preview cetak kertas F4 */
+        .print-preview .paper {
+            width: 100%;
+            max-width: 794px;
+            min-height: 1248px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .print-preview .paper .print-kop {
+            display: block !important;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .print-preview .paper .print-kop h2 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .print-preview .paper .print-kop p {
+            font-size: 11px;
+            margin: 2px 0;
+        }
+
+        .print-preview .paper .print-kop hr {
+            border-top: 2px solid #000;
+            margin-bottom: 8px;
+        }
+
+        .print-preview .paper .print-title {
+            display: block !important;
+            text-align: center;
+            font-size: 14pt;
+            margin-bottom: 15px;
+        }
+
+        .print-preview .paper .btn {
+            display: none !important;
+        }
+
+        .print-preview .paper .d-flex.justify-content-between {
+            display: none !important;
+        }
+
+        .print-preview .paper .card:has(form) {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .print-preview .paper {
+                min-height: auto;
+                padding: 12px;
+            }
+        }
+
+        /* Capture: abaikan ukuran kertas, semua elemen laporan */
+        .print-preview .paper.paper-capture {
+            max-width: none;
+            min-height: 0;
+            padding: 16px;
+            box-shadow: none;
         }
 
         .loading-overlay {

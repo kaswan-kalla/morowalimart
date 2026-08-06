@@ -21,6 +21,11 @@ class Home extends BaseController
 
     public function index()
     {
+        // Admin langsung ke panel admin
+        if (is_admin()) {
+            return redirect()->to('admin/dashboard');
+        }
+
         $data = [
             'content'          => 'home',
             'meta_title'       => 'Marketplace - Belanja Online Terpercaya',
