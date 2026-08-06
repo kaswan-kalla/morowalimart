@@ -134,17 +134,22 @@
     }
 
     // Preview cetak F4 (mobile: tombol jadi screenshot)
+    function setPreviewTitle() {
+        const menuName = ($('.sidebar .nav-link.active').text().trim()) ||
+            (document.querySelector('.main-content h4') ? document.querySelector('.main-content h4').textContent.trim() : '') ||
+            'Preview';
+        $('#printPreviewModal .modal-title').html('<i class="bi bi-file-earmark-text me-2"></i>' + menuName);
+    }
+
     function openPrintPreview() {
         const source = document.querySelector('.main-content');
         const paper = document.getElementById('printPreviewPaper');
         if (source) {
             paper.innerHTML = source.innerHTML;
         }
-        // Judul modal = nama menu sidebar yang aktif
-        const menuName = ($('.sidebar .nav-link.active').text().trim()) ||
-            (document.querySelector('.main-content h4') ? document.querySelector('.main-content h4').textContent.trim() : '') ||
-            'Preview';
-        $('#printPreviewModal .modal-title').html('<i class="bi bi-file-earmark-text me-2"></i>' + menuName);
+        // Preview cetak: tampilan kertas F4
+        paper.classList.remove('paper-capture');
+        setPreviewTitle();
         $('#printPreviewModal').modal('show');
     }
 
@@ -153,7 +158,7 @@
         window.print();
     });
 
-    // Salin seluruh laporan (view cetak kertas putih, tanpa ukuran kertas) ke clipboard
+    // Salin Gambar: capture tersembunyi (tanpa preview) lebar tetap 794px agar laporan utuh
     function copyReportImage() {
         if (typeof html2canvas === 'undefined') {
             showToast('Gagal memuat html2canvas, periksa koneksi', 'error');
@@ -163,12 +168,13 @@
         if (!source) {
             return;
         }
+        // Clone tersembunyi di luar layar, lalu hapus setelah di-copy
         const wrapper = document.createElement('div');
         wrapper.className = 'print-preview';
         wrapper.style.position = 'fixed';
         wrapper.style.left = '-9999px';
         wrapper.style.top = '0';
-        wrapper.style.width = source.offsetWidth + 'px';
+        wrapper.style.width = '794px';
         const clone = source.cloneNode(true);
         clone.className += ' paper paper-capture';
         wrapper.appendChild(clone);
@@ -186,7 +192,14 @@
                     navigator.clipboard.write([new ClipboardItem({
                         'image/png': blob
                     })]).then(function() {
-                        showToast('Gambar disalin, silakan paste di WhatsApp', 'success');
+                        // SweetAlert timer, tutup otomatis
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Gambar Disalin',
+                            text: 'Silakan paste di WhatsApp',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
                     }).catch(function() {
                         downloadCanvas(canvas);
                     });
