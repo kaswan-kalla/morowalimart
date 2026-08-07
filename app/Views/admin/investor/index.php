@@ -13,75 +13,108 @@
             </div>
         </div>
 
-        <!-- Stat Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-md-3">
-                <div class="card shadow-sm border-0 bg-primary text-white">
-                    <div class="card-body">
-                        <small>Total Investor</small>
-                        <h3 class="fw-bold mb-0" id="totalInvestors">0</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card shadow-sm border-0 bg-warning text-white">
-                    <div class="card-body">
-                        <small>Total Modal Terkumpul</small>
-                        <h3 class="fw-bold mb-0" id="totalAccumulated">Rp 0</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card shadow-sm border-0 bg-info text-white">
-                    <div class="card-body">
-                        <small>Aktif</small>
-                        <h3 class="fw-bold mb-0" id="activeCount">0</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card shadow-sm border-0 bg-secondary text-white">
-                    <div class="card-body">
-                        <small>Nonaktif</small>
-                        <h3 class="fw-bold mb-0" id="inactiveCount">0</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4" id="investorTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#tabData" type="button" role="tab">
+                    <i class="bi bi-people me-1"></i>Data Investor
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="resume-tab" data-bs-toggle="tab" data-bs-target="#tabResume" type="button" role="tab">
+                    <i class="bi bi-list-check me-1"></i>Resume Investasi
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="investorTabContent">
+            <div class="tab-pane fade show active" id="tabData" role="tabpanel">
 
-        <!-- Charts -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-12">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2"></i>Distribusi Modal Terkumpul</h6>
-                        <p class="text-muted small">Berdasarkan total investasi per investor</p>
-                        <div style="max-height:260px;position:relative;">
-                            <canvas id="pieAccumulated"></canvas>
+                <!-- Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm border-0 bg-primary text-white">
+                            <div class="card-body">
+                                <small>Total Investor</small>
+                                <h3 class="fw-bold mb-0" id="totalInvestors">0</h3>
+                            </div>
                         </div>
-                        <div class="mt-3" id="accumulatedLegend"></div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm border-0 bg-warning text-white">
+                            <div class="card-body">
+                                <small>Total Modal Terkumpul</small>
+                                <h3 class="fw-bold mb-0" id="totalAccumulated">Rp 0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm border-0 bg-info text-white">
+                            <div class="card-body">
+                                <small>Aktif</small>
+                                <h3 class="fw-bold mb-0" id="activeCount">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm border-0 bg-secondary text-white">
+                            <div class="card-body">
+                                <small>Nonaktif</small>
+                                <h3 class="fw-bold mb-0" id="inactiveCount">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2"></i>Distribusi Modal Terkumpul</h6>
+                                <p class="text-muted small">Berdasarkan total investasi per investor</p>
+                                <div style="max-height:260px;position:relative;">
+                                    <canvas id="pieAccumulated"></canvas>
+                                </div>
+                                <div class="mt-3" id="accumulatedLegend"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nama Investor</th>
+                                        <th>Kontak</th>
+                                        <th>Email</th>
+                                        <th>Total Modal</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="investorBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Table -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nama Investor</th>
-                                <th>Kontak</th>
-                                <th>Email</th>
-                                <th>Total Modal</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="investorBody"></tbody>
-                    </table>
+            <div class="tab-pane fade" id="tabResume" role="tabpanel">
+                <!-- Resume Investasi -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light" id="resumeHead"></thead>
+                                <tbody id="resumeBody"></tbody>
+                                <tfoot id="resumeFoot"></tfoot>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -299,9 +332,80 @@
         });
     }
 
+    // Resume investasi bentuk matrix: baris = pemodal, kolom = nomor investasi
+    function loadResume() {
+        $.get('<?= base_url('admin/investments/data') ?>', function(res) {
+            let data = res.data || [];
+
+            // Nomor investasi unik (urut kemunculan)
+            let invNumbers = [];
+            data.forEach(function(v) {
+                if (v.nomor_invest && invNumbers.indexOf(v.nomor_invest) === -1) {
+                    invNumbers.push(v.nomor_invest);
+                }
+            });
+            // Urutkan dari nomor terendah (numeric, bukan string)
+            invNumbers.sort(function(a, b) {
+                let na = parseInt((a.match(/\d+/) || ['0'])[0], 10) || 0;
+                let nb = parseInt((b.match(/\d+/) || ['0'])[0], 10) || 0;
+                return na - nb;
+            });
+
+            // Kelompokkan per pemodal
+            let investorMap = {};
+            data.forEach(function(v) {
+                let key = v.id_investor || v.investor_name;
+                if (!investorMap[key]) {
+                    investorMap[key] = {
+                        name: v.investor_name,
+                        cells: {},
+                        total: 0
+                    };
+                }
+                let amt = parseFloat(v.total_invest) || 0;
+                investorMap[key].cells[v.nomor_invest] = (investorMap[key].cells[v.nomor_invest] || 0) + amt;
+                investorMap[key].total += amt;
+            });
+
+            // Header matrix
+            let head = '<tr><th>Nama Pemodal</th>';
+            invNumbers.forEach(function(n) {
+                head += '<th class="text-end">' + escapeHtml(n) + '</th>';
+            });
+            head += '<th class="text-end">Total Pemodal</th></tr>';
+            $('#resumeHead').html(head);
+
+            // Body matrix
+            let html = '';
+            let colTotals = {};
+            let grand = 0;
+            Object.keys(investorMap).forEach(function(key) {
+                let inv = investorMap[key];
+                html += '<tr><td><strong>' + escapeHtml(inv.name) + '</strong></td>';
+                invNumbers.forEach(function(n) {
+                    let amt = inv.cells[n] || 0;
+                    colTotals[n] = (colTotals[n] || 0) + amt;
+                    html += '<td class="text-end">' + (amt ? formatRupiah(amt) : '-') + '</td>';
+                });
+                grand += inv.total;
+                html += '<td class="text-end fw-bold">' + formatRupiah(inv.total) + '</td></tr>';
+            });
+            $('#resumeBody').html(html || '<tr><td colspan="' + (invNumbers.length + 2) + '" class="text-center">Tidak ada data</td></tr>');
+
+            // Footer: total per nomor investasi + grand total
+            let foot = '<tr class="table-light fw-bold"><td>Grand Total</td>';
+            invNumbers.forEach(function(n) {
+                foot += '<td class="text-end">' + formatRupiah(colTotals[n] || 0) + '</td>';
+            });
+            foot += '<td class="text-end">' + formatRupiah(grand) + '</td></tr>';
+            $('#resumeFoot').html(foot);
+        });
+    }
+
     $(document).ready(function() {
         loadInvestors();
         loadChart();
+        loadResume();
     });
 </script>
 <?= $this->endSection() ?>
