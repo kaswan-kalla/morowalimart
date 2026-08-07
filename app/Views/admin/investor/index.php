@@ -105,6 +105,10 @@
 
             <div class="tab-pane fade" id="tabResume" role="tabpanel">
                 <!-- Resume Investasi -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Resume Investasi</h5>
+                    <button class="btn btn-outline-success" onclick="copyResumeMatrix()"><i class="bi bi-clipboard me-1"></i>Salin Gambar</button>
+                </div>
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <div class="table-responsive">
@@ -329,6 +333,64 @@
                     }
                 });
             }
+        });
+    }
+
+    // Salin matrix resume investasi ke clipboard (paste di WA)
+    function copyResumeMatrix() {
+        if (typeof html2canvas === 'undefined') {
+            showToast('Gagal memuat html2canvas, periksa koneksi', 'error');
+            return;
+        }
+        const table = document.querySelector('#tabResume table');
+        if (!table || !$('#resumeBody tr').length) {
+            showToast('Belum ada data untuk disalin', 'warning');
+            return;
+        }
+        // Clone tersembunyi di luar layar (lebar tetap 794px agar matrix utuh)
+        const tClone = table.cloneNode(true);
+        tClone.style.width = '100%';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'print-preview';
+        wrapper.style.position = 'fixed';
+        wrapper.style.left = '-9999px';
+        wrapper.style.top = '0';
+        wrapper.style.width = '794px';
+        wrapper.innerHTML =
+            '<div class="paper paper-capture">' +
+            '<div class="text-center mb-3"><h4 class="fw-bold mb-0">Resume Investasi</h4>' +
+            '<small class="text-muted">Data per ' + new Date().toLocaleDateString('id-ID') + '</small></div>';
+        wrapper.querySelector('.paper').appendChild(tClone);
+        document.body.appendChild(wrapper);
+
+        html2canvas(wrapper.querySelector('.paper'), {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        }).then(function(canvas) {
+            wrapper.remove();
+            canvas.toBlob(function(blob) {
+                if (blob && navigator.clipboard && window.ClipboardItem) {
+                    navigator.clipboard.write([new ClipboardItem({
+                        'image/png': blob
+                    })]).then(function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Gambar Disalin',
+                            text: 'Silakan paste di WhatsApp',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }).catch(function() {
+                        downloadCanvas(canvas);
+                    });
+                } else {
+                    downloadCanvas(canvas);
+                }
+            }, 'image/png');
+        }).catch(function(err) {
+            wrapper.remove();
+            showToast('Gagal mengambil screenshot: ' + err.message, 'error');
         });
     }
 
