@@ -360,6 +360,31 @@
         if (val) this.value = parseInt(val).toLocaleString('id-ID');
     });
 
+    // Default harga dari pembelian terakhir outlet yang sama (hanya mode tambah)
+    function applyLastPurchaseDefaults() {
+        if ($('#terimaId').val()) return; // jangan saat edit
+        let idLokasi = $('select[name="id_lokasi"]').val();
+        let idBarang = $('select[name="id_barang"]').val();
+        if (!idLokasi) return;
+        // Prioritas: barang yang sama di outlet yang sama, fallback semua barang outlet itu
+        let sameBarang = terimaData.filter(v =>
+            String(v.id_lokasi) === String(idLokasi) && String(v.id_barang) === String(idBarang));
+        let pool = sameBarang.length ? sameBarang :
+            terimaData.filter(v => String(v.id_lokasi) === String(idLokasi));
+        if (!pool.length) return;
+        // Pembelian terakhir: tanggal terbaru, tie-break id terbesar
+        let last = pool.reduce(function(a, b) {
+            let keyA = (a.tanggal || '') + ':' + String(a.id).padStart(10, '0');
+            let keyB = (b.tanggal || '') + ':' + String(b.id).padStart(10, '0');
+            return keyB > keyA ? b : a;
+        });
+        $('input[name="harga_beli"]').val(last.harga_beli ? new Intl.NumberFormat('id-ID').format(last.harga_beli) : '');
+        $('input[name="harga_jual"]').val(last.harga_jual ? new Intl.NumberFormat('id-ID').format(last.harga_jual) : '');
+        $('input[name="fee_outlet"]').val(last.fee_outlet ? new Intl.NumberFormat('id-ID').format(last.fee_outlet) : '');
+    }
+
+    $('#terimaForm select[name="id_barang"], #terimaForm select[name="id_lokasi"]').on('change', applyLastPurchaseDefaults);
+
     $('#terimaForm').on('submit', function(e) {
         e.preventDefault();
         let id = $('#terimaId').val();
