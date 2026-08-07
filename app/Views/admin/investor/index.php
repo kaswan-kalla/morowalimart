@@ -394,6 +394,11 @@
         });
     }
 
+    // Format angka tanpa "Rp" (untuk matrix resume)
+    function formatAngka(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
     // Resume investasi bentuk matrix: baris = pemodal, kolom = nomor investasi
     function loadResume() {
         $.get('<?= base_url('admin/investments/data') ?>', function(res) {
@@ -434,7 +439,7 @@
             invNumbers.forEach(function(n) {
                 head += '<th class="text-end">' + escapeHtml(n) + '</th>';
             });
-            head += '<th class="text-end">Total Pemodal</th></tr>';
+            head += '<th class="text-end">Total Pemodal</th><th class="text-end">Persentase</th></tr>';
             $('#resumeHead').html(head);
 
             // Body matrix
@@ -442,24 +447,29 @@
             let colTotals = {};
             let grand = 0;
             Object.keys(investorMap).forEach(function(key) {
+                grand += investorMap[key].total;
+            });
+            Object.keys(investorMap).forEach(function(key) {
                 let inv = investorMap[key];
                 html += '<tr><td><strong>' + escapeHtml(inv.name) + '</strong></td>';
                 invNumbers.forEach(function(n) {
                     let amt = inv.cells[n] || 0;
                     colTotals[n] = (colTotals[n] || 0) + amt;
-                    html += '<td class="text-end">' + (amt ? formatRupiah(amt) : '-') + '</td>';
+                    html += '<td class="text-end">' + (amt ? formatAngka(amt) : '-') + '</td>';
                 });
-                grand += inv.total;
-                html += '<td class="text-end fw-bold">' + formatRupiah(inv.total) + '</td></tr>';
+                html += '<td class="text-end fw-bold">' + formatAngka(inv.total) + '</td>';
+                let pct = grand > 0 ? (inv.total / grand * 100) : 0;
+                html += '<td class="text-end fw-bold">' + pct.toLocaleString('id-ID', { maximumFractionDigits: 2 }) + '%</td></tr>';
             });
-            $('#resumeBody').html(html || '<tr><td colspan="' + (invNumbers.length + 2) + '" class="text-center">Tidak ada data</td></tr>');
+            $('#resumeBody').html(html || '<tr><td colspan="' + (invNumbers.length + 3) + '" class="text-center">Tidak ada data</td></tr>');
 
             // Footer: total per nomor investasi + grand total
             let foot = '<tr class="table-light fw-bold"><td>Grand Total</td>';
             invNumbers.forEach(function(n) {
-                foot += '<td class="text-end">' + formatRupiah(colTotals[n] || 0) + '</td>';
+                foot += '<td class="text-end">' + formatAngka(colTotals[n] || 0) + '</td>';
             });
-            foot += '<td class="text-end">' + formatRupiah(grand) + '</td></tr>';
+            foot += '<td class="text-end">' + formatAngka(grand) + '</td>';
+            foot += '<td class="text-end">100%</td></tr>';
             $('#resumeFoot').html(foot);
         });
     }
