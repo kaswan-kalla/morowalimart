@@ -459,7 +459,9 @@
                 });
                 html += '<td class="text-end fw-bold">' + formatAngka(inv.total) + '</td>';
                 let pct = grand > 0 ? (inv.total / grand * 100) : 0;
-                html += '<td class="text-end fw-bold">' + pct.toLocaleString('id-ID', { maximumFractionDigits: 2 }) + '%</td></tr>';
+                html += '<td class="text-end fw-bold">' + pct.toLocaleString('id-ID', {
+                    maximumFractionDigits: 2
+                }) + '%</td></tr>';
             });
             $('#resumeBody').html(html || '<tr><td colspan="' + (invNumbers.length + 3) + '" class="text-center">Tidak ada data</td></tr>');
 

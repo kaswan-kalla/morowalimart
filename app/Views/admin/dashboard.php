@@ -84,6 +84,8 @@
                     <div class="col-6 col-md-3"><a href="<?= base_url('admin/stores') ?>" class="btn btn-outline-success w-100"><i class="bi bi-shop"></i> Kelola Toko</a></div>
                     <div class="col-6 col-md-3"><a href="<?= base_url('admin/products') ?>" class="btn btn-outline-warning w-100"><i class="bi bi-box"></i> Kelola Produk</a></div>
                     <div class="col-6 col-md-3"><a href="<?= base_url('admin/payments') ?>" class="btn btn-outline-info w-100"><i class="bi bi-credit-card"></i> Verifikasi Bayar</a></div>
+                    <div class="col-6 col-md-3"><a href="<?= base_url('admin/reports/transactions') ?>" class="btn btn-outline-secondary w-100"><i class="bi bi-cart"></i> Pembelian</a></div>
+                    <div class="col-6 col-md-3"><a href="<?= base_url('admin/reports/sales') ?>" class="btn btn-outline-danger w-100"><i class="bi bi-graph-up"></i> Penjualan</a></div>
                 </div>
             </div>
         </div>
