@@ -294,6 +294,14 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->get('laporan-fee', 'Admin\LaporanFee::index');
 });
 
+// === API MOBILE (tanpa login, id_lokasi dikirim dari app) ===
+$routes->group('api/v1', ['namespace' => 'App\Controllers\Api'], function ($routes) {
+    $routes->get('lokasi', 'Lokasi::index');
+    $routes->get('barang', 'Barang::index');
+    $routes->post('penerimaan', 'Penerimaan::store');
+    $routes->post('pengeluaran', 'Pengeluaran::store');
+});
+
 // === COURIER DASHBOARD ===
 $routes->group('courier', ['filter' => 'courier'], function ($routes) {
     $routes->get('/', 'Courier::index');

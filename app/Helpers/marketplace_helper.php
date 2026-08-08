@@ -146,6 +146,47 @@ if (!function_exists('delete_image')) {
     }
 }
 
+if (!function_exists('stok_outlet')) {
+    /**
+     * Stok per barang di satu outlet: pembelian - penjualan + mutasi masuk - mutasi keluar
+     * @return array [id_barang => stok]
+     */
+    function stok_outlet($idLokasi)
+    {
+        $db = \Config\Database::connect();
+        $db->query("CREATE TABLE IF NOT EXISTS mutasi (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            id_barang INT NOT NULL,
+            id_lokasi_asal INT NOT NULL,
+            id_lokasi_tujuan INT NOT NULL,
+            jumlah INT NOT NULL DEFAULT 0,
+            tanggal DATE NULL,
+            keterangan TEXT NULL,
+            created_at DATETIME NULL,
+            updated_at DATETIME NULL,
+            deleted_at DATETIME NULL
+        )");
+
+        $rows = $db->query(
+            "SELECT b.id,
+                COALESCE(p.j,0) - COALESCE(k.j,0) + COALESCE(mi.j,0) - COALESCE(mo.j,0) as stok
+             FROM barang b
+             LEFT JOIN (SELECT id_barang, SUM(jumlah) j FROM penerimaan WHERE id_lokasi = ? AND deleted_at IS NULL GROUP BY id_barang) p ON p.id_barang = b.id
+             LEFT JOIN (SELECT id_barang, SUM(jumlah) j FROM pengeluaran WHERE id_lokasi = ? AND deleted_at IS NULL GROUP BY id_barang) k ON k.id_barang = b.id
+             LEFT JOIN (SELECT id_barang, SUM(jumlah) j FROM mutasi WHERE id_lokasi_tujuan = ? AND deleted_at IS NULL GROUP BY id_barang) mi ON mi.id_barang = b.id
+             LEFT JOIN (SELECT id_barang, SUM(jumlah) j FROM mutasi WHERE id_lokasi_asal = ? AND deleted_at IS NULL GROUP BY id_barang) mo ON mo.id_barang = b.id
+             WHERE b.deleted_at IS NULL",
+            [$idLokasi, $idLokasi, $idLokasi, $idLokasi]
+        )->getResultArray();
+
+        $stok = [];
+        foreach ($rows as $r) {
+            $stok[$r['id']] = (int) $r['stok'];
+        }
+        return $stok;
+    }
+}
+
 if (!function_exists('json_response')) {
     /**
      * Return JSON response standar

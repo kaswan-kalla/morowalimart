@@ -48,7 +48,7 @@
                 <td>${u.id}</td>
                 <td>${u.name}</td>
                 <td>${u.email}</td>
-                <td><span class="badge bg-${u.role === 'admin' ? 'danger' : (u.role === 'seller' ? 'primary' : 'secondary')}">${u.role}</span></td>
+                <td><span class="badge bg-${u.role === 'admin' ? 'danger' : (u.role === 'petugas' ? 'info' : (u.role === 'seller' ? 'primary' : 'secondary'))}">${u.role}</span>${u.role === 'petugas' && u.lokasi_name ? ' <small class="text-muted">(' + u.lokasi_name + ')</small>' : ''}</td>
                 <td><span class="badge bg-${u.is_active ? 'success' : 'secondary'}">${u.is_active ? 'Aktif' : 'Nonaktif'}</span></td>
                 <td>${new Date(u.created_at).toLocaleDateString('id-ID')}</td>
                 <td>
@@ -66,27 +66,45 @@
     }
 
     function editRole(id, currentRole) {
-        let roles = ['buyer', 'seller', 'admin'];
-        let html = roles.map(r => `<option value="${r}" ${r === currentRole ? 'selected' : ''}>${r}</option>`).join('');
+        let roles = ['buyer', 'seller', 'petugas', 'admin'];
         Swal.fire({
             title: 'Ubah Role',
             input: 'select',
             inputOptions: Object.fromEntries(roles.map(r => [r, r])),
             inputValue: currentRole,
             showCancelButton: true,
-            confirmButtonText: 'Simpan'
+            confirmButtonText: 'Lanjut'
         }).then(result => {
-            if (result.isConfirmed) {
-                $.post('<?= base_url('admin/users/update-role') ?>', {
-                    id: id,
-                    role: result.value
-                }, function(res) {
-                    if (res.status) {
-                        showToast('Role diperbarui', 'success');
-                        loadUsers();
-                    } else showToast(res.message, 'danger');
-                });
+            if (!result.isConfirmed) return;
+            if (result.value !== 'petugas') {
+                saveRole(id, result.value);
+                return;
             }
+            // Petugas wajib pilih outlet
+            $.get('<?= base_url('admin/lokasi/data') ?>', function(res) {
+                Swal.fire({
+                    title: 'Pilih Outlet',
+                    input: 'select',
+                    inputOptions: Object.fromEntries(res.data.map(l => [l.id, l.nama_lokasi])),
+                    showCancelButton: true,
+                    confirmButtonText: 'Simpan'
+                }).then(r2 => {
+                    if (r2.isConfirmed) saveRole(id, 'petugas', r2.value);
+                });
+            });
+        });
+    }
+
+    function saveRole(id, role, idLokasi) {
+        $.post('<?= base_url('admin/users/update-role') ?>', {
+            id: id,
+            role: role,
+            id_lokasi: idLokasi || ''
+        }, function(res) {
+            if (res.status) {
+                showToast('Role diperbarui', 'success');
+                loadUsers();
+            } else showToast(res.message, 'danger');
         });
     }
 

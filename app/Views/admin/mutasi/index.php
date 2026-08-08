@@ -316,9 +316,13 @@
                 if (id) {
                     bootstrap.Modal.getInstance($('#mutasiModal')[0]).hide();
                 } else {
-                    // Tambah baru: modal tetap terbuka, hapus hanya barang & jumlah
+                    // Tambah baru: modal tetap terbuka, reset semua input kecuali tanggal
                     $('#mutasiForm select[name="id_barang"]').val('');
+                    $('#mutasiForm select[name="id_lokasi_asal"]').val('');
+                    $('#mutasiForm select[name="id_lokasi_tujuan"]').val('');
                     $('#mutasiForm input[name="jumlah"]').val('');
+                    $('#mutasiForm textarea[name="keterangan"]').val('');
+                    $('#stokInfo').text('');
                 }
                 loadData();
             } else {

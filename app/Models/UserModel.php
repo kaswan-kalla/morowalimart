@@ -15,8 +15,16 @@ class UserModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $allowedFields    = [
-        'name', 'email', 'password', 'phone', 'photo',
-        'role', 'is_active', 'reset_token', 'reset_expires'
+        'name',
+        'email',
+        'password',
+        'phone',
+        'photo',
+        'role',
+        'is_active',
+        'reset_token',
+        'reset_expires',
+        'id_lokasi'
     ];
     protected $useTimestamps    = true;
     protected $dateFormat       = 'datetime';
@@ -52,8 +60,8 @@ class UserModel extends Model
     public function findByResetToken(string $token)
     {
         return $this->where('reset_token', $token)
-                    ->where('reset_expires >', date('Y-m-d H:i:s'))
-                    ->first();
+            ->where('reset_expires >', date('Y-m-d H:i:s'))
+            ->first();
     }
 
     /**
