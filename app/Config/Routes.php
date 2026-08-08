@@ -256,14 +256,17 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->get('penerimaan/data', 'Admin\Penerimaan::data');
     $routes->get('penerimaan/get/(:num)', 'Admin\Penerimaan::get/$1');
     $routes->post('penerimaan/store', 'Admin\Penerimaan::store');
+    $routes->post('penerimaan/store-bulk', 'Admin\Penerimaan::storeBulk');
     $routes->post('penerimaan/update/(:num)', 'Admin\Penerimaan::update/$1');
     $routes->post('penerimaan/delete/(:num)', 'Admin\Penerimaan::delete/$1');
+    $routes->get('penerimaan/getStokLokasi/(:num)', 'Admin\Penerimaan::getStokLokasi/$1');
 
     // Inventory - Pengeluaran
     $routes->get('pengeluaran', 'Admin\Pengeluaran::index');
     $routes->get('pengeluaran/data', 'Admin\Pengeluaran::data');
     $routes->get('pengeluaran/get/(:num)', 'Admin\Pengeluaran::get/$1');
     $routes->post('pengeluaran/store', 'Admin\Pengeluaran::store');
+    $routes->post('pengeluaran/store-bulk', 'Admin\Pengeluaran::storeBulk');
     $routes->post('pengeluaran/update/(:num)', 'Admin\Pengeluaran::update/$1');
     $routes->post('pengeluaran/delete/(:num)', 'Admin\Pengeluaran::delete/$1');
     $routes->get('pengeluaran/chart', 'Admin\Pengeluaran::chart');

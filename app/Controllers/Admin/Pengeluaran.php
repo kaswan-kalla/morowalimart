@@ -152,7 +152,7 @@ class Pengeluaran extends BaseController
         ]);
     }
 
-    public function getStokLokasi($id_lokasi)
+    private function stokMap($idLokasi)
     {
         $db = \Config\Database::connect();
         $db->query("CREATE TABLE IF NOT EXISTS mutasi (
@@ -178,7 +178,7 @@ class Pengeluaran extends BaseController
              LEFT JOIN (SELECT id_barang, SUM(jumlah) j FROM mutasi WHERE id_lokasi_tujuan = ? AND deleted_at IS NULL GROUP BY id_barang) mi ON mi.id_barang = b.id
              LEFT JOIN (SELECT id_barang, SUM(jumlah) j FROM mutasi WHERE id_lokasi_asal = ? AND deleted_at IS NULL GROUP BY id_barang) mo ON mo.id_barang = b.id
              WHERE b.deleted_at IS NULL",
-            [$id_lokasi, $id_lokasi, $id_lokasi, $id_lokasi]
+            [$idLokasi, $idLokasi, $idLokasi, $idLokasi]
         )->getResultArray();
 
         $stok = [];
@@ -186,6 +186,77 @@ class Pengeluaran extends BaseController
             $stok[$r['id']] = (int)$r['stok'];
         }
 
-        return $this->response->setJSON(['status' => true, 'stok' => $stok]);
+        return $stok;
+    }
+
+    public function getStokLokasi($id_lokasi)
+    {
+        $db = \Config\Database::connect();
+
+        // harga jual terakhir per barang (dari pembelian terbaru)
+        $harga = [];
+        $rows = $db->query(
+            "SELECT id_barang, harga_jual FROM penerimaan WHERE deleted_at IS NULL ORDER BY tanggal DESC, id DESC"
+        )->getResultArray();
+        foreach ($rows as $r) {
+            if (!isset($harga[$r['id_barang']])) {
+                $harga[$r['id_barang']] = (int)$r['harga_jual'];
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => true,
+            'stok'   => $this->stokMap($id_lokasi),
+            'harga'  => $harga,
+        ]);
+    }
+
+    // Simpan beberapa item penjualan sekaligus (input massal)
+    public function storeBulk()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['status' => false]);
+        }
+
+        $idLokasi = $this->request->getPost('id_lokasi');
+        $tanggal  = $this->request->getPost('tanggal');
+        if (!$idLokasi || !$tanggal) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Lokasi dan tanggal wajib diisi']);
+        }
+
+        $idBarang   = $this->request->getPost('id_barang') ?: [];
+        $hargaJual  = $this->request->getPost('harga_jual') ?: [];
+        $jumlah     = $this->request->getPost('jumlah') ?: [];
+        $keterangan = $this->request->getPost('keterangan') ?: [];
+
+        $stokMap = $this->stokMap($idLokasi);
+        $saved = 0;
+        foreach ($idBarang as $i => $barangId) {
+            $jml = (int) str_replace(',', '', $jumlah[$i] ?? 0);
+            if (!$barangId || $jml <= 0) {
+                continue;
+            }
+            $stok = $stokMap[$barangId] ?? 0;
+            if ($jml > $stok) {
+                return $this->response->setJSON([
+                    'status'  => false,
+                    'message' => 'Item #' . ($i + 1) . ': jumlah melebihi stok (sisa ' . number_format($stok) . ')',
+                ]);
+            }
+            $this->model->insert([
+                'id_barang'  => $barangId,
+                'id_lokasi'  => $idLokasi,
+                'harga_jual' => (float) str_replace(',', '', $hargaJual[$i] ?? 0),
+                'jumlah'     => $jml,
+                'tanggal'    => $tanggal,
+                'keterangan' => $keterangan[$i] ?? '',
+            ]);
+            $saved++;
+        }
+
+        return $this->response->setJSON([
+            'status'  => $saved > 0,
+            'message' => $saved > 0 ? $saved . ' item penjualan berhasil disimpan' : 'Tidak ada item dengan jumlah di atas 0',
+        ]);
     }
 }

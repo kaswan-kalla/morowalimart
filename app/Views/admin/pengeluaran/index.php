@@ -26,18 +26,6 @@
             </div>
         </div>
 
-        <!-- Pie Chart -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="fw-bold mb-3">
-                    <i class="bi bi-pie-chart me-2"></i>Total Item Keluar per Outlet
-                </h6>
-                <div style="max-height:400px;">
-                    <canvas id="pieOutlet"></canvas>
-                </div>
-            </div>
-        </div>
-
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="table-responsive">
@@ -62,12 +50,12 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Edit -->
 <div class="modal fade" id="keluarModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="keluarModalTitle">Tambah Penjualan</h5>
+                <h5 class="modal-title" id="keluarModalTitle">Edit Penjualan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="keluarForm">
@@ -112,10 +100,61 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary" id="btnSubmitKeluar">Tambah Baru</button>
-                    <button type="button" class="btn btn-success" id="btnAddNewKeluar" style="display:none" onclick="resetToAdd()">+ Tambah Baru</button>
+                    <button type="submit" class="btn btn-warning" id="btnSubmitKeluar">Perbarui</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Input Massal -->
+<div class="modal fade" id="bulkKeluarModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-list-ol me-2"></i>Input Penjualan Barang</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Lokasi <span class="text-danger">*</span></label>
+                        <select name="bulk_lokasi" class="form-select" required>
+                            <option value="">-- Pilih Lokasi --</option>
+                            <?php foreach ($lokasi as $l): ?>
+                                <option value="<?= $l['id'] ?>"><?= htmlspecialchars($l['nama_lokasi']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tanggal <span class="text-danger">*</span></label>
+                        <input type="date" name="bulk_tanggal" class="form-control" required>
+                    </div>
+                </div>
+                <div class="table-responsive" style="max-height:55vh;overflow-y:auto;">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="table-light" style="position:sticky;top:0;z-index:1;">
+                            <tr>
+                                <th style="width:40px">#</th>
+                                <th>Nama Barang</th>
+                                <th style="width:150px">Harga Satuan</th>
+                                <th style="width:180px">Jumlah</th>
+                                <th style="width:140px" class="text-end">Total Harga</th>
+                                <th style="width:100px" class="text-end">Stok</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkKeluarBody"></tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <small class="text-muted">Daftar barang otomatis dari stok lokasi terpilih. Isi jumlah, yang 0 dilewati.</small>
+                    <div>
+                        <button type="button" class="btn btn-outline-danger btn-sm me-1" onclick="resetBulkRows()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+                        <button type="button" class="btn btn-primary" onclick="submitBulkKeluar()"><i class="bi bi-check2"></i> Simpan Semua</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -217,64 +256,6 @@
     }
 
     let keluarData = [];
-    let chartOutlet = null;
-
-    const CHART_COLORS = ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6610f2'];
-
-    function loadChart() {
-        $.get('<?= base_url('admin/pengeluaran/chart') ?>', function(res) {
-            if (!res.status || !res.per_lokasi.length) return;
-            let labels = res.per_lokasi.map(p => p.name);
-            let data = res.per_lokasi.map(p => parseInt(p.total));
-            let total = res.total_all;
-
-            let ctx = document.getElementById('pieOutlet').getContext('2d');
-            if (chartOutlet) chartOutlet.destroy();
-
-            chartOutlet = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels,
-                    datasets: [{
-                        data,
-                        backgroundColor: CHART_COLORS.slice(0, labels.length)
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'right',
-                            labels: {
-                                font: {
-                                    size: 13
-                                },
-                                generateLabels: function(chart) {
-                                    let orig = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                                    orig.forEach(function(o, i) {
-                                        let val = data[i];
-                                        let pct = ((val / total) * 100).toFixed(1);
-                                        o.text = o.text + ': ' + val.toLocaleString('id-ID') + ' (' + pct + '%)';
-                                    });
-                                    return orig;
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(ctx) {
-                                    let pct = ((ctx.parsed / total) * 100).toFixed(1);
-                                    return ctx.label + ': ' + ctx.parsed.toLocaleString('id-ID') + ' item (' + pct + '%)';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    }
 
     function loadData() {
         $.get('<?= base_url('admin/pengeluaran/data') ?>', function(res) {
@@ -302,15 +283,182 @@
         });
     }
 
+    let stokMap = {};
+    let hargaMap = {};
+
     function showForm() {
-        $('#keluarModalTitle').text('Tambah Penjualan');
-        $('#keluarForm')[0].reset();
-        $('#keluarId').val('');
-        $('input[name="tanggal"]').val(new Date().toISOString().split('T')[0]);
-        $('#btnSubmitKeluar').text('Tambah Baru').removeClass('btn-warning').addClass('btn-primary');
-        $('#btnAddNewKeluar').hide();
-        updateStokBarang();
-        new bootstrap.Modal($('#keluarModal')).show();
+        // Input massal: pilih lokasi dulu, daftar barang muncul otomatis
+        $('select[name="bulk_lokasi"]').val('');
+        $('input[name="bulk_tanggal"]').val(new Date().toISOString().split('T')[0]);
+        $('#bulkKeluarBody').html('<tr><td colspan="7" class="text-center text-muted py-4">Pilih Lokasi untuk memuat daftar barang</td></tr>');
+        stokMap = {};
+        hargaMap = {};
+        new bootstrap.Modal($('#bulkKeluarModal')).show();
+    }
+
+    // ===== Input massal =====
+    // Baris dibuat otomatis per barang: nama text readonly, harga & stok sudah terisi
+    function buildBulkRows() {
+        let html = '';
+        $('select[name="id_barang"] option[value!=""]').each(function() {
+            let id = $(this).val();
+            let nama = $(this).data('nama');
+            let stok = stokMap[id] || 0;
+            if (stok <= 0) return; // tanpa stok jangan ditampilkan
+            html += `<tr>
+        <td class="bulk-no text-center text-muted"></td>
+        <td><input type="hidden" class="bulk-id" name="id_barang[]" value="${id}">
+            <input type="text" class="form-control form-control-sm bulk-nama" value="${nama}" readonly></td>
+        <td><input type="text" class="form-control form-control-sm text-end bulk-harga price-format" name="harga_jual[]" value="${hargaMap[id] ? new Intl.NumberFormat('id-ID').format(hargaMap[id]) : '0'}"></td>
+        <td>
+            <div class="input-group input-group-sm">
+                <button type="button" class="btn btn-outline-secondary bulk-minus"><i class="bi bi-dash-lg"></i></button>
+                <input type="text" class="form-control text-center bulk-jumlah" name="jumlah[]" value="0" inputmode="numeric">
+                <button type="button" class="btn btn-outline-secondary bulk-plus"><i class="bi bi-plus-lg"></i></button>
+            </div>
+        </td>
+        <td class="text-end bulk-total fw-bold"></td>
+        <td class="text-end bulk-stok"></td>
+        <td><input type="text" class="form-control form-control-sm bulk-ket" name="keterangan[]"></td>
+    </tr>`;
+        });
+        $('#bulkKeluarBody').html(html || '<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada barang dengan stok di lokasi ini</td></tr>');
+        renumberBulkRows();
+        $('#bulkKeluarBody tr').each(function() {
+            updateBulkRow($(this));
+        });
+    }
+
+    function resetBulkRows() {
+        $('#bulkKeluarBody tr').each(function() {
+            $(this).find('.bulk-jumlah').val('0');
+            $(this).find('.bulk-ket').val('');
+            updateBulkRow($(this));
+        });
+    }
+
+    function renumberBulkRows() {
+        $('#bulkKeluarBody tr').each(function(i) {
+            $(this).find('.bulk-no').text(i + 1);
+        });
+    }
+
+    // Hitung ulang total harga & sisa stok per baris
+    function updateBulkRow($row) {
+        let idBarang = $row.find('.bulk-id').val();
+        let harga = parseInt(String($row.find('.bulk-harga').val()).replace(/\./g, '')) || 0;
+        let jumlah = parseInt(String($row.find('.bulk-jumlah').val()).replace(/[^0-9]/g, '')) || 0;
+        let stok = stokMap[idBarang] || 0;
+        $row.find('.bulk-total').text(harga && jumlah ? new Intl.NumberFormat('id-ID').format(harga * jumlah) : '-');
+        let sisa = stok - jumlah;
+        let $stok = $row.find('.bulk-stok');
+        $stok.text(sisa.toLocaleString('id-ID'));
+        $stok.removeClass('text-danger text-success fw-bold');
+        $stok.addClass(sisa < 0 ? 'text-danger fw-bold' : (jumlah > 0 ? 'text-success fw-bold' : ''));
+    }
+
+    function loadBulkStok() {
+        let idLokasi = $('select[name="bulk_lokasi"]').val();
+        if (!idLokasi) {
+            stokMap = {};
+            hargaMap = {};
+            $('#bulkKeluarBody').html('<tr><td colspan="7" class="text-center text-muted py-4">Pilih Lokasi untuk memuat daftar barang</td></tr>');
+            return;
+        }
+        $.get('<?= base_url('admin/pengeluaran/getStokLokasi') ?>/' + idLokasi, function(res) {
+            if (!res.status) return;
+            stokMap = res.stok || {};
+            hargaMap = res.harga || {};
+            buildBulkRows();
+        });
+    }
+
+    // Event input massal
+    $(document).on('click', '.bulk-plus', function() {
+        let $row = $(this).closest('tr');
+        let $jml = $row.find('.bulk-jumlah');
+        let val = (parseInt(String($jml.val()).replace(/[^0-9]/g, '')) || 0) + 1;
+        let stok = stokMap[$row.find('.bulk-id').val()] || 0;
+        if (val > stok) val = stok;
+        $jml.val(val);
+        updateBulkRow($row);
+    });
+
+    $(document).on('click', '.bulk-minus', function() {
+        let $row = $(this).closest('tr');
+        let $jml = $row.find('.bulk-jumlah');
+        let val = (parseInt(String($jml.val()).replace(/[^0-9]/g, '')) || 0) - 1;
+        if (val < 0) val = 0;
+        $jml.val(val);
+        updateBulkRow($row);
+    });
+
+    $(document).on('input', '.bulk-jumlah', function() {
+        let $row = $(this).closest('tr');
+        let val = String(this.value).replace(/[^0-9]/g, '');
+        let stok = stokMap[$row.find('.bulk-id').val()] || 0;
+        if (val && parseInt(val) > stok) val = String(stok);
+        this.value = val;
+        updateBulkRow($row);
+    });
+
+    $(document).on('input', '.bulk-harga', function() {
+        updateBulkRow($(this).closest('tr'));
+    });
+
+    function submitBulkKeluar() {
+        let idLokasi = $('select[name="bulk_lokasi"]').val();
+        let tanggal = $('input[name="bulk_tanggal"]').val();
+        if (!idLokasi || !tanggal) {
+            showToast('Lokasi dan tanggal wajib diisi', 'warning');
+            return;
+        }
+        let items = [];
+        $('#bulkKeluarBody tr').each(function() {
+            let $r = $(this);
+            let idBarang = $r.find('.bulk-id').val();
+            let jumlah = parseInt(String($r.find('.bulk-jumlah').val()).replace(/[^0-9]/g, '')) || 0;
+            if (idBarang && jumlah > 0) {
+                items.push({
+                    id_barang: idBarang,
+                    harga_jual: String($r.find('.bulk-harga').val()).replace(/\./g, ''),
+                    jumlah: jumlah,
+                    keterangan: $r.find('.bulk-ket').val() || ''
+                });
+            }
+        });
+        if (!items.length) {
+            showToast('Tidak ada item dengan jumlah di atas 0', 'warning');
+            return;
+        }
+        let data = {
+            id_lokasi: idLokasi,
+            tanggal: tanggal,
+            id_barang: items.map(i => i.id_barang),
+            harga_jual: items.map(i => i.harga_jual),
+            jumlah: items.map(i => i.jumlah),
+            keterangan: items.map(i => i.keterangan)
+        };
+        Swal.fire({
+            title: 'Simpan penjualan?',
+            text: items.length + ' item akan disimpan',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal'
+        }).then(r => {
+            if (!r.isConfirmed) return;
+            $.post('<?= base_url('admin/pengeluaran/store-bulk') ?>', data, function(res) {
+                if (res.status) {
+                    showToast(res.message, 'success');
+                    // Muat ulang stok & harga, modal tetap terbuka untuk input berikutnya
+                    loadBulkStok();
+                    loadData();
+                } else {
+                    showToast(res.message, 'danger');
+                }
+            });
+        });
     }
 
     function editData(id) {
@@ -324,8 +472,7 @@
         $('input[name="jumlah"]').val(parseInt(d.jumlah).toLocaleString('id-ID'));
         $('input[name="tanggal"]').val(d.tanggal || '');
         $('textarea[name="keterangan"]').val(d.keterangan || '');
-        $('#btnSubmitKeluar').text('Perbarui').removeClass('btn-primary').addClass('btn-warning');
-        $('#btnAddNewKeluar').show();
+        $('#btnSubmitKeluar').text('Perbarui');
         updateStokBarang();
         new bootstrap.Modal($('#keluarModal')).show();
     }
@@ -360,102 +507,30 @@
         if (val) this.value = parseInt(val).toLocaleString('id-ID');
     });
 
-    function resetToAdd() {
-        // Simpan data form saat ini sebagai entri baru (copy)
-        $('.price-format, .number-format').each(function() {
-            this.value = this.value.replace(/\./g, '');
-        });
-        var data = $('#keluarForm').serialize();
-        // Format ulang tampilan
-        $('.price-format').each(function() {
-            if (this.value) this.value = new Intl.NumberFormat('id-ID').format(parseInt(this.value));
-        });
-        $('.number-format').each(function() {
-            if (this.value) this.value = parseInt(this.value).toLocaleString('id-ID');
-        });
-        // Konfirmasi jika tanggal bukan hari ini
-        let tgl = $('input[name="tanggal"]').val();
-        let today = new Date().toISOString().split('T')[0];
-        if (tgl && tgl !== today) {
-            Swal.fire({
-                title: 'Tanggal bukan hari ini?',
-                text: 'Data akan disimpan dengan tanggal ' + tgl,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Simpan',
-                cancelButtonText: 'Batal'
-            }).then(r => {
-                if (r.isConfirmed) saveCopyKeluar(data);
-            });
-        } else {
-            saveCopyKeluar(data);
-        }
-    }
-
-    function saveCopyKeluar(data) {
-        $.post('<?= base_url('admin/pengeluaran/store') ?>', data, function(res) {
-            if (res.status) {
-                showToast(res.message, 'success');
-                loadData();
-                loadChart();
-            } else {
-                showToast(res.message, 'danger');
-            }
-        });
-    }
-
     $('#keluarForm').on('submit', function(e) {
         e.preventDefault();
         let id = $('#keluarId').val();
-        if (id) {
-            // Konfirmasi sebelum update
-            Swal.fire({
-                title: 'Perbarui data?',
-                text: 'Data penjualan akan diperbarui',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Perbarui',
-                cancelButtonText: 'Batal'
-            }).then(r => {
-                if (r.isConfirmed) submitKeluar(id);
-            });
-        } else {
-            // Konfirmasi jika tanggal bukan hari ini
-            let tgl = $('input[name="tanggal"]').val();
-            let today = new Date().toISOString().split('T')[0];
-            if (tgl && tgl !== today) {
-                Swal.fire({
-                    title: 'Tanggal bukan hari ini?',
-                    text: 'Data akan disimpan dengan tanggal ' + tgl,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Simpan',
-                    cancelButtonText: 'Batal'
-                }).then(r => {
-                    if (r.isConfirmed) submitKeluar(id);
-                });
-            } else {
-                submitKeluar(id);
-            }
-        }
+        if (!id) return;
+        Swal.fire({
+            title: 'Perbarui data?',
+            text: 'Data penjualan akan diperbarui',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Perbarui',
+            cancelButtonText: 'Batal'
+        }).then(r => {
+            if (r.isConfirmed) submitKeluar(id);
+        });
     });
 
     function submitKeluar(id) {
         $('.price-format, .number-format').each(function() {
             this.value = this.value.replace(/\./g, '');
         });
-        let url = id ? '<?= base_url('admin/pengeluaran/update') ?>/' + id : '<?= base_url('admin/pengeluaran/store') ?>';
-        $.post(url, $('#keluarForm').serialize(), function(res) {
+        $.post('<?= base_url('admin/pengeluaran/update') ?>/' + id, $('#keluarForm').serialize(), function(res) {
             if (res.status) {
                 showToast(res.message, 'success');
-                if (id) {
-                    bootstrap.Modal.getInstance($('#keluarModal')[0]).hide();
-                } else {
-                    // Tambah baru: modal tetap terbuka, hapus hanya barang & jumlah
-                    $('#keluarForm select[name="id_barang"]').val('');
-                    $('#keluarForm input[name="jumlah"]').val('');
-                    updateStokBarang();
-                }
+                bootstrap.Modal.getInstance($('#keluarModal')[0]).hide();
                 loadData();
             } else {
                 showToast(res.message, 'danger');
@@ -493,12 +568,11 @@
 
     $(document).ready(function() {
         loadData();
-        loadChart();
 
-        // Update label stok barang saat outlet dipilih
+        // Update label stok barang saat outlet dipilih (modal edit)
         $('select[name="id_lokasi"]').on('change', updateStokBarang);
 
-        // Auto-fill harga jual dari data pembelian terbaru
+        // Auto-fill harga jual dari data pembelian terbaru (modal edit)
         $('select[name="id_barang"]').on('change', function() {
             var idBarang = $(this).val();
             if (!idBarang) return;
@@ -508,6 +582,9 @@
                 }
             });
         });
+
+        // Load stok & opsi barang saat lokasi dipilih (input massal)
+        $('select[name="bulk_lokasi"]').on('change', loadBulkStok);
     });
 </script>
 <?= $this->endSection() ?>

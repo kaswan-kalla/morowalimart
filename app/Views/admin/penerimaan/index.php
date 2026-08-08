@@ -55,12 +55,12 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Edit -->
 <div class="modal fade" id="terimaModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="terimaModalTitle">Tambah Pembelian</h5>
+                <h5 class="modal-title" id="terimaModalTitle">Edit Pembelian</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="terimaForm">
@@ -71,7 +71,7 @@
                         <select name="id_barang" class="form-select" required>
                             <option value="">-- Pilih Barang --</option>
                             <?php foreach ($barang as $b): ?>
-                                <option value="<?= $b['id'] ?>"><?= htmlspecialchars($b['nama_barang']) ?></option>
+                                <option value="<?= $b['id'] ?>" data-nama="<?= htmlspecialchars($b['nama_barang']) ?>"><?= htmlspecialchars($b['nama_barang']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -117,10 +117,63 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary" id="btnSubmit">Tambah Baru</button>
-                    <button type="button" class="btn btn-success" id="btnAddNew" style="display:none" onclick="resetToAdd()">+ Tambah Baru</button>
+                    <button type="submit" class="btn btn-warning" id="btnSubmit">Perbarui</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Input Massal -->
+<div class="modal fade" id="bulkTerimaModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-list-ol me-2"></i>Input Pembelian Barang</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Lokasi <span class="text-danger">*</span></label>
+                        <select name="bulk_lokasi" class="form-select" required>
+                            <option value="">-- Pilih Lokasi --</option>
+                            <?php foreach ($lokasi as $l): ?>
+                                <option value="<?= $l['id'] ?>"><?= htmlspecialchars($l['nama_lokasi']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tanggal <span class="text-danger">*</span></label>
+                        <input type="date" name="bulk_tanggal" class="form-control" required>
+                    </div>
+                </div>
+                <div class="table-responsive" style="max-height:55vh;overflow-y:auto;">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="table-light" style="position:sticky;top:0;z-index:1;">
+                            <tr>
+                                <th style="width:35px">#</th>
+                                <th>Nama Barang</th>
+                                <th style="width:130px">Harga Beli</th>
+                                <th style="width:130px">Harga Jual</th>
+                                <th style="width:120px">Fee Outlet</th>
+                                <th style="width:160px">Jumlah</th>
+                                <th style="width:130px" class="text-end">Total Harga</th>
+                                <th style="width:90px" class="text-end">Stok</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkTerimaBody"></tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <small class="text-muted">Daftar barang otomatis dari lokasi terpilih. Isi jumlah, yang 0 dilewati.</small>
+                    <div>
+                        <button type="button" class="btn btn-outline-danger btn-sm me-1" onclick="resetBulkRows()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+                        <button type="button" class="btn btn-primary" onclick="submitBulkTerima()"><i class="bi bi-check2"></i> Simpan Semua</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -278,14 +331,194 @@
         });
     }
 
+    let stokMap = {};
+
     function showForm() {
-        $('#terimaModalTitle').text('Tambah Pembelian');
-        $('#terimaForm')[0].reset();
-        $('#terimaId').val('');
-        $('input[name="tanggal"]').val(new Date().toISOString().split('T')[0]);
-        $('#btnSubmit').text('Tambah Baru').removeClass('btn-warning').addClass('btn-primary');
-        $('#btnAddNew').hide();
-        new bootstrap.Modal($('#terimaModal')).show();
+        // Input massal: pilih lokasi dulu, daftar barang muncul otomatis
+        $('select[name="bulk_lokasi"]').val('');
+        $('input[name="bulk_tanggal"]').val(new Date().toISOString().split('T')[0]);
+        $('#bulkTerimaBody').html('<tr><td colspan="9" class="text-center text-muted py-4">Pilih Lokasi untuk memuat daftar barang</td></tr>');
+        stokMap = {};
+        new bootstrap.Modal($('#bulkTerimaModal')).show();
+    }
+
+    // ===== Input massal =====
+    // Baris dibuat otomatis per barang: nama text readonly, harga & stok sudah terisi
+    function buildBulkRows() {
+        let idLokasi = $('select[name="bulk_lokasi"]').val();
+        let html = '';
+        $('select[name="id_barang"] option[value!=""]').each(function() {
+            let id = $(this).val();
+            let nama = $(this).data('nama');
+            let stok = stokMap[id] || 0;
+            let last = lastPurchase(id, idLokasi);
+            let fmt = function(v) {
+                return v ? new Intl.NumberFormat('id-ID').format(v) : '0';
+            };
+            html += `<tr>
+        <td class="bulk-no text-center text-muted"></td>
+        <td><input type="hidden" class="bulk-id" name="id_barang[]" value="${id}">
+            <input type="text" class="form-control form-control-sm bulk-nama" value="${nama}" readonly></td>
+        <td><input type="text" class="form-control form-control-sm text-end bulk-harga-beli price-format" name="harga_beli[]" value="${fmt(last ? last.harga_beli : 0)}"></td>
+        <td><input type="text" class="form-control form-control-sm text-end bulk-harga-jual price-format" name="harga_jual[]" value="${fmt(last ? last.harga_jual : 0)}"></td>
+        <td><input type="text" class="form-control form-control-sm text-end bulk-fee price-format" name="fee_outlet[]" value="${fmt(last ? last.fee_outlet : 0)}"></td>
+        <td>
+            <div class="input-group input-group-sm">
+                <button type="button" class="btn btn-outline-secondary bulk-minus"><i class="bi bi-dash-lg"></i></button>
+                <input type="text" class="form-control text-center bulk-jumlah" name="jumlah[]" value="0" inputmode="numeric">
+                <button type="button" class="btn btn-outline-secondary bulk-plus"><i class="bi bi-plus-lg"></i></button>
+            </div>
+        </td>
+        <td class="text-end bulk-total fw-bold"></td>
+        <td class="text-end bulk-stok"></td>
+        <td><input type="text" class="form-control form-control-sm bulk-ket" name="keterangan[]"></td>
+    </tr>`;
+        });
+        $('#bulkTerimaBody').html(html || '<tr><td colspan="9" class="text-center text-muted py-4">Tidak ada barang di lokasi ini</td></tr>');
+        renumberBulkRows();
+        $('#bulkTerimaBody tr').each(function() {
+            updateBulkRow($(this));
+        });
+    }
+
+    // Pembelian terakhir barang ini (prioritas lokasi terpilih, fallback semua lokasi)
+    function lastPurchase(idBarang, idLokasi) {
+        let pool = terimaData.filter(v => String(v.id_barang) === String(idBarang) && (!idLokasi || String(v.id_lokasi) === String(idLokasi)));
+        if (!pool.length && idLokasi) pool = terimaData.filter(v => String(v.id_barang) === String(idBarang));
+        if (!pool.length) return null;
+        return pool.reduce(function(a, b) {
+            let ka = (a.tanggal || '') + ':' + String(a.id).padStart(10, '0');
+            let kb = (b.tanggal || '') + ':' + String(b.id).padStart(10, '0');
+            return kb > ka ? b : a;
+        });
+    }
+
+    function resetBulkRows() {
+        $('#bulkTerimaBody tr').each(function() {
+            $(this).find('.bulk-jumlah').val('0');
+            $(this).find('.bulk-ket').val('');
+            updateBulkRow($(this));
+        });
+    }
+
+    function renumberBulkRows() {
+        $('#bulkTerimaBody tr').each(function(i) {
+            $(this).find('.bulk-no').text(i + 1);
+        });
+    }
+
+    // Hitung ulang total harga (harga beli x jumlah) & stok akhir per baris
+    function updateBulkRow($row) {
+        let idBarang = $row.find('.bulk-id').val();
+        let hargaBeli = parseInt(String($row.find('.bulk-harga-beli').val()).replace(/\./g, '')) || 0;
+        let jumlah = parseInt(String($row.find('.bulk-jumlah').val()).replace(/[^0-9]/g, '')) || 0;
+        let stok = stokMap[idBarang] || 0;
+        $row.find('.bulk-total').text(hargaBeli && jumlah ? new Intl.NumberFormat('id-ID').format(hargaBeli * jumlah) : '-');
+        let akhir = stok + jumlah;
+        let $stok = $row.find('.bulk-stok');
+        $stok.text(akhir.toLocaleString('id-ID'));
+        $stok.removeClass('text-success fw-bold');
+        if (jumlah > 0) $stok.addClass('text-success fw-bold');
+    }
+
+    function loadBulkStok() {
+        let idLokasi = $('select[name="bulk_lokasi"]').val();
+        if (!idLokasi) {
+            stokMap = {};
+            $('#bulkTerimaBody').html('<tr><td colspan="9" class="text-center text-muted py-4">Pilih Lokasi untuk memuat daftar barang</td></tr>');
+            return;
+        }
+        $.get('<?= base_url('admin/penerimaan/getStokLokasi') ?>/' + idLokasi, function(res) {
+            if (!res.status) return;
+            stokMap = res.stok || {};
+            buildBulkRows();
+        });
+    }
+
+    // Event input massal
+    $(document).on('click', '.bulk-plus', function() {
+        let $row = $(this).closest('tr');
+        let $jml = $row.find('.bulk-jumlah');
+        $jml.val((parseInt(String($jml.val()).replace(/[^0-9]/g, '')) || 0) + 1);
+        updateBulkRow($row);
+    });
+
+    $(document).on('click', '.bulk-minus', function() {
+        let $row = $(this).closest('tr');
+        let $jml = $row.find('.bulk-jumlah');
+        let val = (parseInt(String($jml.val()).replace(/[^0-9]/g, '')) || 0) - 1;
+        if (val < 0) val = 0;
+        $jml.val(val);
+        updateBulkRow($row);
+    });
+
+    $(document).on('input', '.bulk-jumlah', function() {
+        let $row = $(this).closest('tr');
+        this.value = String(this.value).replace(/[^0-9]/g, '');
+        updateBulkRow($row);
+    });
+
+    $(document).on('input', '.bulk-harga-beli, .bulk-harga-jual, .bulk-fee', function() {
+        updateBulkRow($(this).closest('tr'));
+    });
+
+    function submitBulkTerima() {
+        let idLokasi = $('select[name="bulk_lokasi"]').val();
+        let tanggal = $('input[name="bulk_tanggal"]').val();
+        if (!idLokasi || !tanggal) {
+            showToast('Lokasi dan tanggal wajib diisi', 'warning');
+            return;
+        }
+        let items = [];
+        $('#bulkTerimaBody tr').each(function() {
+            let $r = $(this);
+            let idBarang = $r.find('.bulk-id').val();
+            let jumlah = parseInt(String($r.find('.bulk-jumlah').val()).replace(/[^0-9]/g, '')) || 0;
+            if (idBarang && jumlah > 0) {
+                items.push({
+                    id_barang: idBarang,
+                    harga_beli: String($r.find('.bulk-harga-beli').val()).replace(/\./g, ''),
+                    harga_jual: String($r.find('.bulk-harga-jual').val()).replace(/\./g, ''),
+                    fee_outlet: String($r.find('.bulk-fee').val()).replace(/\./g, ''),
+                    jumlah: jumlah,
+                    keterangan: $r.find('.bulk-ket').val() || ''
+                });
+            }
+        });
+        if (!items.length) {
+            showToast('Tidak ada item dengan jumlah di atas 0', 'warning');
+            return;
+        }
+        let data = {
+            id_lokasi: idLokasi,
+            tanggal: tanggal,
+            id_barang: items.map(i => i.id_barang),
+            harga_beli: items.map(i => i.harga_beli),
+            harga_jual: items.map(i => i.harga_jual),
+            fee_outlet: items.map(i => i.fee_outlet),
+            jumlah: items.map(i => i.jumlah),
+            keterangan: items.map(i => i.keterangan)
+        };
+        Swal.fire({
+            title: 'Simpan pembelian?',
+            text: items.length + ' item akan disimpan',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal'
+        }).then(r => {
+            if (!r.isConfirmed) return;
+            $.post('<?= base_url('admin/penerimaan/store-bulk') ?>', data, function(res) {
+                if (res.status) {
+                    showToast(res.message, 'success');
+                    // Muat ulang stok, modal tetap terbuka untuk input berikutnya
+                    loadBulkStok();
+                    loadData();
+                } else {
+                    showToast(res.message, 'danger');
+                }
+            });
+        });
     }
 
     function editData(id) {
@@ -301,52 +534,8 @@
         $('input[name="jumlah"]').val(parseInt(d.jumlah).toLocaleString('id-ID'));
         $('input[name="tanggal"]').val(d.tanggal || '');
         $('textarea[name="keterangan"]').val(d.keterangan || '');
-        $('#btnSubmit').text('Perbarui').removeClass('btn-primary').addClass('btn-warning');
-        $('#btnAddNew').show();
+        $('#btnSubmit').text('Perbarui');
         new bootstrap.Modal($('#terimaModal')).show();
-    }
-
-    function resetToAdd() {
-        // Simpan data form saat ini sebagai entri baru
-        $('.price-format, .number-format').each(function() {
-            this.value = this.value.replace(/\./g, '');
-        });
-        var data = $('#terimaForm').serialize();
-        // Format ulang tampilan
-        $('.price-format').each(function() {
-            if (this.value) this.value = new Intl.NumberFormat('id-ID').format(parseInt(this.value));
-        });
-        $('.number-format').each(function() {
-            if (this.value) this.value = parseInt(this.value).toLocaleString('id-ID');
-        });
-        // Konfirmasi jika tanggal bukan hari ini
-        let tgl = $('input[name="tanggal"]').val();
-        let today = new Date().toISOString().split('T')[0];
-        if (tgl && tgl !== today) {
-            Swal.fire({
-                title: 'Tanggal bukan hari ini?',
-                text: 'Data akan disimpan dengan tanggal ' + tgl,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Simpan',
-                cancelButtonText: 'Batal'
-            }).then(r => {
-                if (r.isConfirmed) saveCopy(data);
-            });
-        } else {
-            saveCopy(data);
-        }
-    }
-
-    function saveCopy(data) {
-        $.post('<?= base_url('admin/penerimaan/store') ?>', data, function(res) {
-            if (res.status) {
-                showToast(res.message, 'success');
-                loadData();
-            } else {
-                showToast(res.message, 'danger');
-            }
-        });
     }
 
     // Rupiah formatting on input
@@ -360,83 +549,30 @@
         if (val) this.value = parseInt(val).toLocaleString('id-ID');
     });
 
-    // Default harga dari pembelian terakhir outlet yang sama (hanya mode tambah)
-    function applyLastPurchaseDefaults() {
-        if ($('#terimaId').val()) return; // jangan saat edit
-        let idLokasi = $('select[name="id_lokasi"]').val();
-        let idBarang = $('select[name="id_barang"]').val();
-        if (!idLokasi) return;
-        // Prioritas: barang yang sama di outlet yang sama, fallback semua barang outlet itu
-        let sameBarang = terimaData.filter(v =>
-            String(v.id_lokasi) === String(idLokasi) && String(v.id_barang) === String(idBarang));
-        let pool = sameBarang.length ? sameBarang :
-            terimaData.filter(v => String(v.id_lokasi) === String(idLokasi));
-        if (!pool.length) return;
-        // Pembelian terakhir: tanggal terbaru, tie-break id terbesar
-        let last = pool.reduce(function(a, b) {
-            let keyA = (a.tanggal || '') + ':' + String(a.id).padStart(10, '0');
-            let keyB = (b.tanggal || '') + ':' + String(b.id).padStart(10, '0');
-            return keyB > keyA ? b : a;
-        });
-        $('input[name="harga_beli"]').val(last.harga_beli ? new Intl.NumberFormat('id-ID').format(last.harga_beli) : '');
-        $('input[name="harga_jual"]').val(last.harga_jual ? new Intl.NumberFormat('id-ID').format(last.harga_jual) : '');
-        $('input[name="fee_outlet"]').val(last.fee_outlet ? new Intl.NumberFormat('id-ID').format(last.fee_outlet) : '');
-    }
-
-    $('#terimaForm select[name="id_barang"], #terimaForm select[name="id_lokasi"]').on('change', applyLastPurchaseDefaults);
-
     $('#terimaForm').on('submit', function(e) {
         e.preventDefault();
         let id = $('#terimaId').val();
-        if (id) {
-            // Konfirmasi sebelum update
-            Swal.fire({
-                title: 'Perbarui data?',
-                text: 'Data pembelian akan diperbarui',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Perbarui',
-                cancelButtonText: 'Batal'
-            }).then(r => {
-                if (r.isConfirmed) submitTerima(id);
-            });
-        } else {
-            // Konfirmasi jika tanggal bukan hari ini
-            let tgl = $('input[name="tanggal"]').val();
-            let today = new Date().toISOString().split('T')[0];
-            if (tgl && tgl !== today) {
-                Swal.fire({
-                    title: 'Tanggal bukan hari ini?',
-                    text: 'Data akan disimpan dengan tanggal ' + tgl,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Simpan',
-                    cancelButtonText: 'Batal'
-                }).then(r => {
-                    if (r.isConfirmed) submitTerima(id);
-                });
-            } else {
-                submitTerima(id);
-            }
-        }
+        if (!id) return;
+        Swal.fire({
+            title: 'Perbarui data?',
+            text: 'Data pembelian akan diperbarui',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Perbarui',
+            cancelButtonText: 'Batal'
+        }).then(r => {
+            if (r.isConfirmed) submitTerima(id);
+        });
     });
 
     function submitTerima(id) {
-        // Remove formatting before submit
         $('.price-format, .number-format').each(function() {
             this.value = this.value.replace(/\./g, '');
         });
-        let url = id ? '<?= base_url('admin/penerimaan/update') ?>/' + id : '<?= base_url('admin/penerimaan/store') ?>';
-        $.post(url, $('#terimaForm').serialize(), function(res) {
+        $.post('<?= base_url('admin/penerimaan/update') ?>/' + id, $('#terimaForm').serialize(), function(res) {
             if (res.status) {
                 showToast(res.message, 'success');
-                if (id) {
-                    bootstrap.Modal.getInstance($('#terimaModal')[0]).hide();
-                } else {
-                    // Tambah baru: modal tetap terbuka, hapus hanya barang & jumlah
-                    $('#terimaForm select[name="id_barang"]').val('');
-                    $('#terimaForm input[name="jumlah"]').val('');
-                }
+                bootstrap.Modal.getInstance($('#terimaModal')[0]).hide();
                 loadData();
             } else {
                 showToast(res.message, 'danger');
@@ -474,6 +610,9 @@
 
     $(document).ready(function() {
         loadData();
+
+        // Load stok & opsi barang saat lokasi dipilih (input massal)
+        $('select[name="bulk_lokasi"]').on('change', loadBulkStok);
     });
 </script>
 <?= $this->endSection() ?>
