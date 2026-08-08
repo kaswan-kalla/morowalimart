@@ -17,7 +17,7 @@
             <h4 class="text-center print-title">Laporan Penjualan Barang</h4>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 page-actions">
             <h4 class="mb-0">Penjualan Barang</h4>
             <div>
                 <button class="btn btn-outline-primary me-1" onclick="openPrintPreview()"><i class="bi bi-printer"></i> Cetak</button>
@@ -109,7 +109,7 @@
 
 <!-- Modal Input Massal -->
 <div class="modal fade" id="bulkKeluarModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-fullscreen-md-down">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="bi bi-list-ol me-2"></i>Input Penjualan Barang</h5>
@@ -132,7 +132,7 @@
                     </div>
                 </div>
                 <div class="table-responsive" style="max-height:55vh;overflow-y:auto;">
-                    <table class="table table-bordered align-middle mb-0">
+                    <table class="table table-bordered align-middle mb-0 bulk-table">
                         <thead class="table-light" style="position:sticky;top:0;z-index:1;">
                             <tr>
                                 <th style="width:40px">#</th>
@@ -147,7 +147,7 @@
                         <tbody id="bulkKeluarBody"></tbody>
                     </table>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="d-flex justify-content-between align-items-center mt-2 bulk-actions">
                     <small class="text-muted">Daftar barang otomatis dari stok lokasi terpilih. Isi jumlah, yang 0 dilewati.</small>
                     <div>
                         <button type="button" class="btn btn-outline-danger btn-sm me-1" onclick="resetBulkRows()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
@@ -160,6 +160,96 @@
 </div>
 
 <style>
+    /* ===== View mobile: form input massal jadi kartu bertumpuk ===== */
+    @media (max-width: 767.98px) {
+        .page-actions {
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .page-actions .btn {
+            flex: 1 1 auto;
+        }
+
+        .bulk-table thead {
+            display: none;
+        }
+
+        .bulk-table,
+        .bulk-table tbody,
+        .bulk-table tr,
+        .bulk-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .bulk-table tr {
+            border: 1px solid #dee2e6 !important;
+            border-radius: .5rem;
+            margin-bottom: .75rem;
+            padding: .4rem .6rem;
+        }
+
+        .bulk-table td {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            border: 0 !important;
+            padding: .35rem 0;
+        }
+
+        .bulk-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            font-size: .78rem;
+            color: #6c757d;
+            flex: 0 0 auto;
+        }
+
+        .bulk-table td .form-control {
+            font-size: 1rem;
+        }
+
+        .bulk-table td > .form-control,
+        .bulk-table td > .input-group {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .bulk-table td .bulk-nama {
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+
+        .bulk-table td .input-group {
+            max-width: 100%;
+        }
+
+        .bulk-table td .input-group .btn {
+            min-width: 46px;
+            min-height: 46px;
+        }
+
+        .bulk-table td .input-group .bulk-jumlah {
+            font-size: 1.1rem;
+        }
+
+        .bulk-actions {
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: .5rem;
+        }
+
+        .bulk-actions .btn {
+            width: 100%;
+        }
+
+        .bulk-actions small {
+            text-align: center;
+        }
+    }
+
     .print-kop {
         display: none;
     }
@@ -306,20 +396,20 @@
             let stok = stokMap[id] || 0;
             if (stok <= 0) return; // tanpa stok jangan ditampilkan
             html += `<tr>
-        <td class="bulk-no text-center text-muted"></td>
-        <td><input type="hidden" class="bulk-id" name="id_barang[]" value="${id}">
+        <td class="bulk-no text-center text-muted" data-label="No"></td>
+        <td data-label="Nama Barang"><input type="hidden" class="bulk-id" name="id_barang[]" value="${id}">
             <input type="text" class="form-control form-control-sm bulk-nama" value="${nama}" readonly></td>
-        <td><input type="text" class="form-control form-control-sm text-end bulk-harga price-format" name="harga_jual[]" value="${hargaMap[id] ? new Intl.NumberFormat('id-ID').format(hargaMap[id]) : '0'}"></td>
-        <td>
+        <td data-label="Harga Satuan"><input type="text" class="form-control form-control-sm text-end bulk-harga price-format" name="harga_jual[]" value="${hargaMap[id] ? new Intl.NumberFormat('id-ID').format(hargaMap[id]) : '0'}"></td>
+        <td data-label="Jumlah">
             <div class="input-group input-group-sm">
                 <button type="button" class="btn btn-outline-secondary bulk-minus"><i class="bi bi-dash-lg"></i></button>
                 <input type="text" class="form-control text-center bulk-jumlah" name="jumlah[]" value="0" inputmode="numeric">
                 <button type="button" class="btn btn-outline-secondary bulk-plus"><i class="bi bi-plus-lg"></i></button>
             </div>
         </td>
-        <td class="text-end bulk-total fw-bold"></td>
-        <td class="text-end bulk-stok"></td>
-        <td><input type="text" class="form-control form-control-sm bulk-ket" name="keterangan[]"></td>
+        <td data-label="Total Harga" class="text-end bulk-total fw-bold"></td>
+        <td data-label="Stok" class="text-end bulk-stok"></td>
+        <td data-label="Keterangan"><input type="text" class="form-control form-control-sm bulk-ket" name="keterangan[]"></td>
     </tr>`;
         });
         $('#bulkKeluarBody').html(html || '<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada barang dengan stok di lokasi ini</td></tr>');

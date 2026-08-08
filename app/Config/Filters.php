@@ -22,6 +22,7 @@ class Filters extends BaseConfig
 		'auth'         => \App\Filters\AuthFilter::class,
 		'seller'       => \App\Filters\SellerFilter::class,
 		'admin'        => \App\Filters\AdminFilter::class,
+		'api-auth'     => \App\Filters\ApiAuthFilter::class,
 	];
 
 	/**
